@@ -1,184 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <base target="_self">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リップズ Search</title>
-    <meta name="description" content="Search for Lipzz content">
+    <title>リップズ</title>
+
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
+        body {
+            background-color: #000;
+        }
+
         .modal-backdrop {
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
+
         .video-container {
-            max-width: 320px;
-            max-height: 160vh;
+            width: 100%;
+            max-width: 180px;
+            max-height: 80vh;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
         }
     </style>
 </head>
-<body class="min-h-screen bg-black text-white">
-    <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
-        <!-- Header Text -->
-        <div class="mb-8 text-center">
-            <a href="#" id="homeLink" class="text-4xl md:text-5xl font-bold text-white hover:text-gray-300 transition-colors duration-300">
-                リップズ
-            </a>
-        </div>
+
+<body class="min-h-screen flex items-center justify-center text-white">
+
+    <div class="flex flex-col items-center gap-6 w-full px-4">
+
+        <!-- Title -->
+        <a href="#" id="homeLink" class="text-4xl font-bold text-white">
+            リップズ
+        </a>
 
         <!-- Image -->
-        <div class="mb-8 flex justify-center">
-            <img 
-                src="https://files.catbox.moe/2sgujb.jpg" 
-                alt="Lipzz image" 
-                class="rounded-lg w-64 md:w-80 lg:w-96 object-cover"
-                loading="lazy"
-            />
-        </div>
+        <img
+            src="https://files.catbox.moe/2sgujb.jpg"
+            alt="Lipzz"
+            class="w-[180px] aspect-square rounded-xl object-cover"
+            loading="lazy"
+        />
 
-        <!-- Search Section -->
-        <div class="w-full max-w-md">
-            <!-- Input Field -->
-            <div class="mb-4">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Enter keyword..." 
-                    class="w-full px-4 py-3 bg-gray-900 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
-                />
-            </div>
+        <!-- Input -->
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="Masukkan kata kunci"
+            class="w-full max-w-xs px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-white"
+        />
 
-            <!-- Search Button -->
-            <div class="mb-12">
-                <button 
-                    id="searchButton" 
-                    class="w-full px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-black transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+        <!-- Button -->
+        <button
+            id="searchButton"
+            class="w-full max-w-xs py-3 rounded-lg bg-purple-600 font-bold hover:bg-purple-700 transition"
+        >
+            SEARCH
+        </button>
+
+    </div>
+
+    <!-- MODAL -->
+    <div id="videoModal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="modal-backdrop absolute inset-0"></div>
+
+        <!-- Centered Modal -->
+        <div class="relative z-10 flex items-center justify-center w-full h-full">
+            <div class="video-container bg-black shadow-2xl">
+                <video id="lipzzVideo" controls preload="metadata">
+                    <source src="" type="video/mp4">
+                </video>
+
+                <!-- Close -->
+                <button
+                    id="closeModal"
+                    class="absolute top-2 right-2 w-8 h-8 bg-white text-black rounded-full flex items-center justify-center"
+                    aria-label="Close"
                 >
-                    SEARCH
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Video Modal -->
-    <div id="videoModal" class="fixed inset-0 z-50 hidden">
-        <!-- Backdrop with blur -->
-        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-70"></div>
-        
-        <!-- Modal Content -->
-        <div class="relative flex items-center justify-center min-h-screen p-4">
-            <div class="video-container bg-black rounded-xl overflow-hidden shadow-2xl">
-                <!-- Video Player -->
-                <video 
-                    id="lipzzVideo" 
-                    class="w-full h-auto" 
-                    controls
-                    preload="metadata"
-                >
-                    <source src="" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                
-                <!-- Close Button -->
-                <div class="absolute top-4 right-4">
-                    <button 
-                        id="closeModal" 
-                        class="bg-white text-black w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-300 transform hover:scale-110"
-                        aria-label="Close video modal"
-                    >
-                        <i class="fas fa-times text-lg"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Define constants
         const CORRECT_KEYWORD = "Lipzz";
         const VIDEO_URL = "https://files.catbox.moe/2tdo94.mp4";
-        
-        // DOM Elements
+
         const searchInput = document.getElementById("searchInput");
         const searchButton = document.getElementById("searchButton");
         const videoModal = document.getElementById("videoModal");
         const lipzzVideo = document.getElementById("lipzzVideo");
         const closeModal = document.getElementById("closeModal");
         const homeLink = document.getElementById("homeLink");
-        
-        // Search function
-        function performSearch() {
-            const keyword = searchInput.value.trim();
-            
-            if (keyword === CORRECT_KEYWORD) {
-                // Set video source
-                lipzzVideo.src = VIDEO_URL;
-                
-                // Show modal
-                videoModal.classList.remove("hidden");
-                videoModal.classList.add("flex");
-                
-                // Play video
-                setTimeout(() => {
-                    lipzzVideo.play().catch(e => console.log("Autoplay prevented:", e));
-                }, 300);
-            }
-            // If keyword is not "Lipzz", do nothing as specified
+
+        function openModal() {
+            videoModal.classList.remove("hidden");
+            lipzzVideo.src = VIDEO_URL;
+            setTimeout(() => lipzzVideo.play(), 200);
         }
-        
-        // Close modal function
-        function closeVideoModal() {
-            // Pause video
+
+        function closeModalFn() {
             lipzzVideo.pause();
             lipzzVideo.currentTime = 0;
-            
-            // Hide modal
-            videoModal.classList.add("hidden");
-            videoModal.classList.remove("flex");
-            
-            // Clear video source
             lipzzVideo.src = "";
-            
-            // Clear search input
+            videoModal.classList.add("hidden");
             searchInput.value = "";
         }
-        
-        // Event Listeners
-        searchButton.addEventListener("click", performSearch);
-        
-        searchInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                performSearch();
+
+        function handleSearch() {
+            if (searchInput.value.trim() === CORRECT_KEYWORD) {
+                openModal();
             }
+        }
+
+        searchButton.addEventListener("click", handleSearch);
+
+        searchInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") handleSearch();
         });
-        
-        closeModal.addEventListener("click", closeVideoModal);
-        
-        // Close modal when clicking on backdrop
-        videoModal.addEventListener("click", (e) => {
+
+        closeModal.addEventListener("click", closeModalFn);
+
+        videoModal.addEventListener("click", e => {
             if (e.target === videoModal || e.target.classList.contains("modal-backdrop")) {
-                closeVideoModal();
+                closeModalFn();
             }
         });
-        
-        // Close modal with Escape key
-        document.addEventListener("keydown", (e) => {
+
+        document.addEventListener("keydown", e => {
             if (e.key === "Escape" && !videoModal.classList.contains("hidden")) {
-                closeVideoModal();
+                closeModalFn();
             }
         });
-        
-        // Home link navigation (prevent default as required)
-        homeLink.addEventListener("click", (e) => {
+
+        homeLink.addEventListener("click", e => {
             e.preventDefault();
-            searchInput.value = "";
             searchInput.focus();
         });
-        
-        // Initialize
+
         searchInput.focus();
     </script>
+
 </body>
 </html>
+                    
