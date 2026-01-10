@@ -1,162 +1,199 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>リップズ</title>
-
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #000;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            transition: filter 0.3s ease;
         }
 
-        .modal-backdrop {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+        body.blurred {
+            filter: blur(8px);
         }
 
-        .video-container {
-            width: 100%;
-            max-width: 180px;
-            max-height: 80vh;
-            border-radius: 18px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        video {
-            width: 100%;
-            height: auto;
+        .title {
+            color: #fff;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-decoration: none;
             display: block;
+        }
+
+        .image-container {
+            margin-bottom: 25px;
+        }
+
+        .main-image {
+            width: 280px;
+            height: auto;
+            border-radius: 15px;
+            display: block;
+        }
+
+        .search-input {
+            width: 280px;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .search-button {
+            width: 280px;
+            padding: 12px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .search-button:active {
+            background-color: #ccc;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-video {
+            display: block;
+            max-width: 100%;
+            max-height: 85vh;
+            width: auto;
+            height: auto;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            z-index: 10;
+        }
+
+        .close-button:hover {
+            background-color: #fff;
         }
     </style>
 </head>
-
-<body class="min-h-screen flex items-center justify-center text-white">
-
-    <div class="flex flex-col items-center gap-6 w-full px-4">
-
-        <!-- Title -->
-        <a href="#" id="homeLink" class="text-4xl font-bold text-white">
-            リップズ
-        </a>
-
-        <!-- Image -->
-        <img
-            src="https://files.catbox.moe/2sgujb.jpg"
-            alt="Lipzz"
-            class="w-[180px] aspect-square rounded-xl object-cover"
-            loading="lazy"
-        />
-
-        <!-- Input -->
-        <input
-            id="searchInput"
-            type="text"
-            placeholder="Masukkan kata kunci"
-            class="w-full max-w-xs px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-white"
-        />
-
-        <!-- Button -->
-        <button
-            id="searchButton"
-            class="w-full max-w-xs py-3 rounded-lg bg-purple-600 font-bold hover:bg-purple-700 transition"
-        >
-            SEARCH
-        </button>
-
+<body>
+    <a href="#" class="title">リップズ</a>
+    
+    <div class="image-container">
+        <img src="https://files.catbox.moe/2sgujb.jpg" alt="リップズ" class="main-image">
     </div>
+    
+    <input type="text" class="search-input" id="searchInput" placeholder="Masukkan kata kunci...">
+    
+    <button class="search-button" onclick="handleSearch()">SEARCH</button>
 
-    <!-- MODAL -->
-    <div id="videoModal" class="fixed inset-0 z-50 hidden">
-        <!-- Backdrop -->
-        <div class="modal-backdrop absolute inset-0"></div>
-
-        <!-- Centered Modal -->
-        <div class="relative z-10 flex items-center justify-center w-full h-full">
-            <div class="video-container bg-black shadow-2xl">
-                <video id="lipzzVideo" controls preload="metadata">
-                    <source src="" type="video/mp4">
-                </video>
-
-                <!-- Close -->
-                <button
-                    id="closeModal"
-                    class="absolute top-2 right-2 w-8 h-8 bg-white text-black rounded-full flex items-center justify-center"
-                    aria-label="Close"
-                >
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal()">×</button>
+            <video class="modal-video" id="modalVideo" controls autoplay>
+                <source src="https://files.catbox.moe/2tdo94.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
 
     <script>
-        const CORRECT_KEYWORD = "Lipzz";
-        const VIDEO_URL = "https://files.catbox.moe/2tdo94.mp4";
-
-        const searchInput = document.getElementById("searchInput");
-        const searchButton = document.getElementById("searchButton");
-        const videoModal = document.getElementById("videoModal");
-        const lipzzVideo = document.getElementById("lipzzVideo");
-        const closeModal = document.getElementById("closeModal");
-        const homeLink = document.getElementById("homeLink");
-
-        function openModal() {
-            videoModal.classList.remove("hidden");
-            lipzzVideo.src = VIDEO_URL;
-            setTimeout(() => lipzzVideo.play(), 200);
-        }
-
-        function closeModalFn() {
-            lipzzVideo.pause();
-            lipzzVideo.currentTime = 0;
-            lipzzVideo.src = "";
-            videoModal.classList.add("hidden");
-            searchInput.value = "";
-        }
+        const searchInput = document.getElementById('searchInput');
+        const videoModal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const body = document.body;
 
         function handleSearch() {
-            if (searchInput.value.trim() === CORRECT_KEYWORD) {
+            const keyword = searchInput.value.trim();
+            
+            if (keyword === 'Lipzz') {
                 openModal();
             }
         }
 
-        searchButton.addEventListener("click", handleSearch);
+        function openModal() {
+            videoModal.classList.add('active');
+            body.classList.add('blurred');
+            modalVideo.currentTime = 0;
+            modalVideo.play();
+        }
 
-        searchInput.addEventListener("keydown", e => {
-            if (e.key === "Enter") handleSearch();
-        });
+        function closeModal() {
+            videoModal.classList.remove('active');
+            body.classList.remove('blurred');
+            modalVideo.pause();
+        }
 
-        closeModal.addEventListener("click", closeModalFn);
-
-        videoModal.addEventListener("click", e => {
-            if (e.target === videoModal || e.target.classList.contains("modal-backdrop")) {
-                closeModalFn();
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch();
             }
         });
 
-        document.addEventListener("keydown", e => {
-            if (e.key === "Escape" && !videoModal.classList.contains("hidden")) {
-                closeModalFn();
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === videoModal) {
+                closeModal();
             }
         });
-
-        homeLink.addEventListener("click", e => {
-            e.preventDefault();
-            searchInput.focus();
-        });
-
-        searchInput.focus();
     </script>
-
 </body>
-</html>
-                    
+</html>            
