@@ -21,14 +21,6 @@
             padding: 40px 20px;
         }
 
-        .content-wrapper {
-            transition: filter 0.3s ease;
-        }
-
-        .content-wrapper.blurred {
-            filter: blur(8px);
-        }
-
         .title {
             color: #fff;
             font-size: 32px;
@@ -89,6 +81,8 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
         }
 
         .modal.active {
@@ -115,15 +109,15 @@
 
         .close-button {
             position: absolute;
-            top: -50px;
-            right: 0;
+            top: -60px;
+            right: 10px;
             background-color: rgba(255, 255, 255, 0.9);
             color: #000;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -163,7 +157,6 @@
         const searchInput = document.getElementById('searchInput');
         const videoModal = document.getElementById('videoModal');
         const modalVideo = document.getElementById('modalVideo');
-        const body = document.body;
 
         function handleSearch() {
             const keyword = searchInput.value.trim();
@@ -175,14 +168,12 @@
 
         function openModal() {
             videoModal.classList.add('active');
-            body.classList.add('blurred');
             modalVideo.currentTime = 0;
             modalVideo.play();
         }
 
         function closeModal() {
             videoModal.classList.remove('active');
-            body.classList.remove('blurred');
             modalVideo.pause();
         }
 
