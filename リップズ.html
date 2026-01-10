@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>リップズ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
       box-sizing: border-box;
@@ -17,6 +18,17 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
+    }
+
+    .page {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      transition: filter 0.3s ease;
+    }
+
+    .page.blur {
+      filter: blur(8px);
     }
 
     .container {
@@ -64,12 +76,11 @@
       cursor: pointer;
     }
 
-    /* Overlay & blur */
+    /* Overlay modal */
     .overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
       display: none;
       justify-content: center;
       align-items: center;
@@ -84,6 +95,7 @@
       width: 320px;
       border-radius: 12px;
       display: block;
+      background: black;
     }
 
     .close-btn {
@@ -100,28 +112,32 @@
       align-items: center;
       font-weight: bold;
       cursor: pointer;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="title">
-      <a href="#">リップズ</a>
-    </div>
+  <!-- Page Content -->
+  <div class="page" id="page">
+    <div class="container">
+      <div class="title">
+        <a href="#">リップズ</a>
+      </div>
 
-    <div class="image-box">
-      <img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
-    </div>
+      <div class="image-box">
+        <img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
+      </div>
 
-    <div class="search-box">
-      <input type="text" id="keyword" placeholder="Masukkan kata kunci">
-      <br>
-      <button onclick="search()">SEARCH</button>
+      <div class="search-box">
+        <input type="text" id="keyword" placeholder="Masukkan kata kunci">
+        <br>
+        <button onclick="search()">SEARCH</button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal Overlay -->
   <div class="overlay" id="overlay">
     <div class="modal">
       <div class="close-btn" onclick="closeModal()">X</div>
@@ -136,6 +152,7 @@
       const value = document.getElementById("keyword").value;
       if (value === "Lipzz") {
         document.getElementById("overlay").style.display = "flex";
+        document.getElementById("page").classList.add("blur");
       }
     }
 
@@ -145,6 +162,7 @@
       video.pause();
       video.currentTime = 0;
       overlay.style.display = "none";
+      document.getElementById("page").classList.remove("blur");
     }
   </script>
 
