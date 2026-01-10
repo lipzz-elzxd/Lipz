@@ -1,152 +1,151 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>リップズ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    .page {
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      position: relative;
-      transition: filter 0.3s ease;
-    }
-    .page.blur { filter: blur(8px); }
-    .container { text-align: center; margin-top: 40px; }
-    .title a {
-      color: white;
-      text-decoration: none;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .image-box { margin: 20px 0; }
-    .image-box img {
-      width: 220px;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-    .search-box input {
-      width: 240px;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-    }
-    .search-box button {
-      margin-top: 12px;
-      padding: 10px 30px;
-      background: white;
-      color: black;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .warning-text {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      opacity: 0.75;
-      pointer-events: none;
-    }
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    .modal { position: relative; }
-    .modal video {
-      width: 320px;
-      border-radius: 12px;
-      background: black;
-    }
-    .close-btn {
-      position: absolute;
-      top: -14px;
-      right: -14px;
-      background: white;
-      color: black;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リップズ</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-top: 40px;
+  font-size: 28px;
+}
+
+img {
+  margin-top: 20px;
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+input {
+  margin-top: 20px;
+  width: 220px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  margin-top: 12px;
+  padding: 10px 30px;
+  border-radius: 10px;
+  border: none;
+  background: white;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.warning {
+  margin-top: 120px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  position: relative;
+}
+
+.modal video {
+  width: 300px;
+  border-radius: 16px;
+}
+
+.close {
+  position: absolute;
+  top: -30px;
+  right: -10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
-<div class="page" id="page">
-  <div class="container">
-    <div class="title"><a href="#">リップズ</a></div>
+<h1>リップズ</h1>
 
-    <div class="image-box">
-      <img src="https://files.catbox.moe/2sgujb.jpg">
-    </div>
+<img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
 
-    <div class="search-box">
-      <input type="text" id="keyword" placeholder="Masukkan kata kunci">
-      <br>
-      <button onclick="search()">SEARCH</button>
-    </div>
-  </div>
+<input id="keyword" type="text" placeholder="Search...">
 
-  <div class="warning-text">This Web Is Sensitif⚠</div>
-</div>
+<button onclick="searchVideo()">SEARCH</button>
 
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="close-btn" onclick="closeModal()">X</div>
-    <video controls id="video"></video>
+<div class="warning">This Web Is Sensitif⚠</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✕</div>
+    <video id="video" controls></video>
   </div>
 </div>
 
 <script>
-  let data = {};
+let videoData = {};
 
-  fetch("data.json")
-    .then(res => res.json())
-    .then(json => data = json);
+// ambil data dari GitHub Pages
+fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
+  .then(res => res.json())
+  .then(data => {
+    videoData = data;
+    console.log("DATA LOADED:", videoData);
+  });
 
-  function search() {
-    const key = document.getElementById("keyword").value.trim();
-    if (data[key]) {
-      const video = document.getElementById("video");
-      video.src = data[key];
-      document.getElementById("overlay").style.display = "flex";
-      document.getElementById("page").classList.add("blur");
-    }
+// fungsi search
+function searchVideo() {
+  const key = document.getElementById("keyword").value
+    .trim()
+    .toLowerCase();
+
+  if (videoData[key]) {
+    openModal(videoData[key]);
   }
+}
 
-  function closeModal() {
-    const video = document.getElementById("video");
-    video.pause();
-    video.currentTime = 0;
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("page").classList.remove("blur");
-  }
+// buka modal
+function openModal(src) {
+  const modal = document.getElementById("modal");
+  const video = document.getElementById("video");
+  video.src = src;
+  modal.style.display = "flex";
+  video.play();
+}
+
+// tutup modal
+function closeModal() {
+  const modal = document.getElementById("modal");
+  const video = document.getElementById("video");
+  video.pause();
+  video.src = "";
+  modal.style.display = "none";
+}
 </script>
 
 </body>
