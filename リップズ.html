@@ -10,13 +10,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         .modal-backdrop {
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .video-container {
-            max-width: 300px;
-            max-height: 80vh;
-        }
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.video-container {
+    width: 100%;
+    max-width: 320px;
+    max-height: 80vh;
+
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+}
     </style>
 </head>
 <body class="min-h-screen bg-black text-white">
