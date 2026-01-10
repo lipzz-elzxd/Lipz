@@ -22,8 +22,10 @@
 
     .page {
       width: 100%;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
+      position: relative;
       transition: filter 0.3s ease;
     }
 
@@ -76,6 +78,19 @@
       cursor: pointer;
     }
 
+    /* Text bawah */
+    .warning-text {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      opacity: 0.75;
+      letter-spacing: 0.5px;
+      text-align: center;
+      pointer-events: none;
+    }
+
     /* Overlay modal */
     .overlay {
       position: fixed;
@@ -118,7 +133,6 @@
 </head>
 <body>
 
-  <!-- Page Content -->
   <div class="page" id="page">
     <div class="container">
       <div class="title">
@@ -135,9 +149,14 @@
         <button onclick="search()">SEARCH</button>
       </div>
     </div>
+
+    <!-- Text bawah -->
+    <div class="warning-text">
+      This Web Is Sensitif⚠
+    </div>
   </div>
 
-  <!-- Modal Overlay -->
+  <!-- Modal -->
   <div class="overlay" id="overlay">
     <div class="modal">
       <div class="close-btn" onclick="closeModal()">X</div>
