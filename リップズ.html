@@ -1,209 +1,152 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リップズ</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>リップズ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
-        body {
-            background-color: #000;
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-            transition: filter 0.3s ease;
-        }
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
 
-        body.blurred {
-            filter: blur(8px);
-        }
+    .container {
+      text-align: center;
+      margin-top: 40px;
+    }
 
-        .title {
-            color: #fff;
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-decoration: none;
-            display: inline-block;
-        }
+    .title a {
+      color: white;
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: bold;
+    }
 
-        .image-container {
-            margin-bottom: 30px;
-        }
+    .image-box {
+      margin: 20px 0;
+    }
 
-        .image-container img {
-            width: 300px;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 15px;
-            display: block;
-        }
+    .image-box img {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
+      margin: 0 auto;
+    }
 
-        .search-input {
-            width: 300px;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #fff;
-            border-radius: 8px;
-            background-color: #000;
-            color: #fff;
-            margin-bottom: 20px;
-            outline: none;
-        }
+    .search-box input {
+      width: 240px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
 
-        .search-input::placeholder {
-            color: #888;
-        }
+    .search-box button {
+      margin-top: 12px;
+      padding: 10px 30px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        .search-button {
-            width: 300px;
-            padding: 12px 15px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #fff;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    /* Overlay & blur */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
 
-        .search-button:hover {
-            background-color: #ddd;
-        }
+    .modal {
+      position: relative;
+    }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+    .modal video {
+      width: 320px;
+      border-radius: 12px;
+      display: block;
+    }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            position: relative;
-            z-index: 1;
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        .close-button {
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 40px;
-            height: 40px;
-            background-color: #fff;
-            color: #000;
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .close-button:hover {
-            background-color: #ddd;
-        }
-
-        .modal video {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .close-button {
-                top: -50px;
-                right: 0;
-            }
-        }
-    </style>
+    .close-btn {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      background: white;
+      color: black;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <a href="#" class="title">リップズ</a>
-    
-    <div class="image-container">
-        <img src="https://files.catbox.moe/2sgujb.jpg" alt="Lipzz">
+
+  <div class="container">
+    <div class="title">
+      <a href="#">リップズ</a>
     </div>
 
-    <input type="text" class="search-input" id="searchInput" placeholder="Enter keyword...">
-    
-    <button class="search-button" id="searchButton">SEARCH</button>
-
-    <div class="modal" id="videoModal">
-        <div class="modal-content">
-            <button class="close-button" id="closeButton">×</button>
-            <video id="videoPlayer" controls autoplay>
-                <source src="https://files.catbox.moe/2tdo94.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+    <div class="image-box">
+      <img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
     </div>
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const videoModal = document.getElementById('videoModal');
-        const closeButton = document.getElementById('closeButton');
-        const videoPlayer = document.getElementById('videoPlayer');
-        const body = document.body;
+    <div class="search-box">
+      <input type="text" id="keyword" placeholder="Masukkan kata kunci">
+      <br>
+      <button onclick="search()">SEARCH</button>
+    </div>
+  </div>
 
-        function openModal() {
-            videoModal.classList.add('active');
-            body.classList.add('blurred');
-            videoPlayer.currentTime = 0;
-            videoPlayer.play();
-        }
+  <!-- Modal -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="close-btn" onclick="closeModal()">X</div>
+      <video controls>
+        <source src="https://files.catbox.moe/2tdo94.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
 
-        function closeModal() {
-            videoModal.classList.remove('active');
-            body.classList.remove('blurred');
-            videoPlayer.pause();
-        }
+  <script>
+    function search() {
+      const value = document.getElementById("keyword").value;
+      if (value === "Lipzz") {
+        document.getElementById("overlay").style.display = "flex";
+      }
+    }
 
-        searchButton.addEventListener('click', () => {
-            const keyword = searchInput.value.trim();
-            if (keyword === 'Lipzz') {
-                openModal();
-            }
-        });
+    function closeModal() {
+      const overlay = document.getElementById("overlay");
+      const video = overlay.querySelector("video");
+      video.pause();
+      video.currentTime = 0;
+      overlay.style.display = "none";
+    }
+  </script>
 
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const keyword = searchInput.value.trim();
-                if (keyword === 'Lipzz') {
-                    openModal();
-                }
-            }
-        });
-
-        closeButton.addEventListener('click', closeModal);
-
-        videoModal.addEventListener('click', (e) => {
-            if (e.target === videoModal) {
-                closeModal();
-            }
-        });
-    </script>
 </body>
 </html>
