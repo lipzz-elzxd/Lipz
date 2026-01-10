@@ -5,11 +5,7 @@
   <title>リップズ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
       margin: 0;
       background: black;
@@ -19,7 +15,6 @@
       justify-content: center;
       align-items: flex-start;
     }
-
     .page {
       width: 100%;
       min-height: 100vh;
@@ -28,45 +23,28 @@
       position: relative;
       transition: filter 0.3s ease;
     }
-
-    .page.blur {
-      filter: blur(8px);
-    }
-
-    .container {
-      text-align: center;
-      margin-top: 40px;
-    }
-
+    .page.blur { filter: blur(8px); }
+    .container { text-align: center; margin-top: 40px; }
     .title a {
       color: white;
       text-decoration: none;
       font-size: 24px;
       font-weight: bold;
     }
-
-    .image-box {
-      margin: 20px 0;
-    }
-
+    .image-box { margin: 20px 0; }
     .image-box img {
       width: 220px;
       height: 220px;
       object-fit: cover;
       border-radius: 16px;
-      display: block;
-      margin: 0 auto;
     }
-
     .search-box input {
       width: 240px;
       padding: 10px;
       border-radius: 6px;
       border: none;
       outline: none;
-      font-size: 14px;
     }
-
     .search-box button {
       margin-top: 12px;
       padding: 10px 30px;
@@ -77,8 +55,6 @@
       font-weight: bold;
       cursor: pointer;
     }
-
-    /* Text bawah */
     .warning-text {
       position: fixed;
       bottom: 40px;
@@ -86,33 +62,23 @@
       transform: translateX(-50%);
       font-size: 14px;
       opacity: 0.75;
-      letter-spacing: 0.5px;
-      text-align: center;
       pointer-events: none;
     }
-
-    /* Overlay modal */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0,0,0,0.6);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 999;
     }
-
-    .modal {
-      position: relative;
-    }
-
+    .modal { position: relative; }
     .modal video {
       width: 320px;
       border-radius: 12px;
-      display: block;
       background: black;
     }
-
     .close-btn {
       position: absolute;
       top: -14px;
@@ -127,63 +93,61 @@
       align-items: center;
       font-weight: bold;
       cursor: pointer;
-      user-select: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="page" id="page">
-    <div class="container">
-      <div class="title">
-        <a href="#">リップズ</a>
-      </div>
+<div class="page" id="page">
+  <div class="container">
+    <div class="title"><a href="#">リップズ</a></div>
 
-      <div class="image-box">
-        <img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
-      </div>
-
-      <div class="search-box">
-        <input type="text" id="keyword" placeholder="Masukkan kata kunci">
-        <br>
-        <button onclick="search()">SEARCH</button>
-      </div>
+    <div class="image-box">
+      <img src="https://files.catbox.moe/2sgujb.jpg">
     </div>
 
-    <!-- Text bawah -->
-    <div class="warning-text">
-      This Web Is Sensitif⚠
+    <div class="search-box">
+      <input type="text" id="keyword" placeholder="Masukkan kata kunci">
+      <br>
+      <button onclick="search()">SEARCH</button>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <div class="close-btn" onclick="closeModal()">X</div>
-      <video controls>
-        <source src="https://files.catbox.moe/2tdo94.mp4" type="video/mp4">
-      </video>
-    </div>
+  <div class="warning-text">This Web Is Sensitif⚠</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="close-btn" onclick="closeModal()">X</div>
+    <video controls id="video"></video>
   </div>
+</div>
 
-  <script>
-    function search() {
-      const value = document.getElementById("keyword").value;
-      if (value === "Lipzz") {
-        document.getElementById("overlay").style.display = "flex";
-        document.getElementById("page").classList.add("blur");
-      }
-    }
+<script>
+  let data = {};
 
-    function closeModal() {
-      const overlay = document.getElementById("overlay");
-      const video = overlay.querySelector("video");
-      video.pause();
-      video.currentTime = 0;
-      overlay.style.display = "none";
-      document.getElementById("page").classList.remove("blur");
+  fetch("data.json")
+    .then(res => res.json())
+    .then(json => data = json);
+
+  function search() {
+    const key = document.getElementById("keyword").value.trim();
+    if (data[key]) {
+      const video = document.getElementById("video");
+      video.src = data[key];
+      document.getElementById("overlay").style.display = "flex";
+      document.getElementById("page").classList.add("blur");
     }
-  </script>
+  }
+
+  function closeModal() {
+    const video = document.getElementById("video");
+    video.pause();
+    video.currentTime = 0;
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("page").classList.remove("blur");
+  }
+</script>
 
 </body>
 </html>
