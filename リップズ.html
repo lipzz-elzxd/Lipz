@@ -73,7 +73,15 @@ button {
   border-radius: 16px;
 }
 
-/* Tombol navigasi di bawah foto */
+.close {
+  position: absolute;
+  top: -35px;
+  right: 0;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Tombol navigasi bawah */
 .nav-btn {
   position: absolute;
   bottom: -40px;
@@ -90,12 +98,11 @@ button {
 .nav-left { left: 0; }
 .nav-right { right: 0; }
 
-.close {
-  position: absolute;
-  top: -35px;
-  right: 0;
-  font-size: 22px;
-  cursor: pointer;
+/* indikator slide */
+.indicator {
+  margin-top: 8px;
+  font-size: 18px;
+  letter-spacing: 4px;
 }
 </style>
 </head>
@@ -151,19 +158,27 @@ function search() {
     img.src = currentImages[currentIndex];
     modalBox.appendChild(img);
 
-    // Tombol navigasi bawah kiri
+    // tombol navigasi bawah kiri
     const leftBtn = document.createElement("button");
     leftBtn.className = "nav-btn nav-left";
     leftBtn.innerText = "<";
     leftBtn.onclick = () => slide(-1);
     modalBox.appendChild(leftBtn);
 
-    // Tombol navigasi bawah kanan
+    // tombol navigasi bawah kanan
     const rightBtn = document.createElement("button");
     rightBtn.className = "nav-btn nav-right";
     rightBtn.innerText = ">";
     rightBtn.onclick = () => slide(1);
     modalBox.appendChild(rightBtn);
+
+    // indikator slide
+    const indicator = document.createElement("div");
+    indicator.className = "indicator";
+    indicator.id = "indicator";
+    modalBox.appendChild(indicator);
+
+    updateIndicator();
   }
 
   document.getElementById("modal").style.display = "flex";
@@ -174,6 +189,17 @@ function slide(direction) {
   if (currentIndex < 0) currentIndex = currentImages.length - 1;
   if (currentIndex >= currentImages.length) currentIndex = 0;
   document.getElementById("mainGallery").src = currentImages[currentIndex];
+  updateIndicator();
+}
+
+function updateIndicator() {
+  const indicator = document.getElementById("indicator");
+  if (!indicator) return;
+  let text = "";
+  for (let i = 0; i < currentImages.length; i++) {
+    text += (i === currentIndex) ? "♦" : "•";
+  }
+  indicator.textContent = text;
 }
 
 function closeModal() {
