@@ -64,6 +64,7 @@ button {
 .modal-box {
   position: relative;
   width: 320px;
+  text-align: center;
 }
 
 .modal video,
@@ -72,21 +73,22 @@ button {
   border-radius: 16px;
 }
 
-.slider {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  overflow-x: auto;
+/* Tombol navigasi di bawah foto */
+.nav-btn {
+  position: absolute;
+  bottom: -40px;
+  font-size: 28px;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  user-select: none;
 }
 
-.slider img {
-  width: 70px;
-  height: 70px;
-  border-radius: 10px;
-  object-fit: cover;
-  cursor: pointer;
-  flex-shrink: 0;
-}
+.nav-left { left: 0; }
+.nav-right { right: 0; }
 
 .close {
   position: absolute;
@@ -118,6 +120,8 @@ button {
 
 <script>
 let data = {};
+let currentIndex = 0;
+let currentImages = [];
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
@@ -139,30 +143,47 @@ function search() {
   }
 
   if (data[key].type === "gallery") {
-    const mainImg = document.createElement("img");
-    mainImg.src = data[key].images[0];
-    modalBox.appendChild(mainImg);
+    currentImages = data[key].images;
+    currentIndex = 0;
 
-    const slider = document.createElement("div");
-    slider.className = "slider";
+    const img = document.createElement("img");
+    img.id = "mainGallery";
+    img.src = currentImages[currentIndex];
+    modalBox.appendChild(img);
 
-    data[key].images.forEach(src => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.onclick = () => mainImg.src = src;
-      slider.appendChild(img);
-    });
+    // Tombol navigasi bawah kiri
+    const leftBtn = document.createElement("button");
+    leftBtn.className = "nav-btn nav-left";
+    leftBtn.innerText = "<";
+    leftBtn.onclick = () => slide(-1);
+    modalBox.appendChild(leftBtn);
 
-    modalBox.appendChild(slider);
+    // Tombol navigasi bawah kanan
+    const rightBtn = document.createElement("button");
+    rightBtn.className = "nav-btn nav-right";
+    rightBtn.innerText = ">";
+    rightBtn.onclick = () => slide(1);
+    modalBox.appendChild(rightBtn);
   }
 
   document.getElementById("modal").style.display = "flex";
 }
 
+function slide(direction) {
+  currentIndex += direction;
+  if (currentIndex < 0) currentIndex = currentImages.length - 1;
+  if (currentIndex >= currentImages.length) currentIndex = 0;
+  document.getElementById("mainGallery").src = currentImages[currentIndex];
+}
+
 function closeModal() {
   const modal = document.getElementById("modal");
   modal.style.display = "none";
-  document.getElementById("modalBox").innerHTML = "";
+  const video = document.querySelector("#modalBox video");
+  if(video) { video.pause(); video.src = ""; }
+  document.getElementById("modalBox").innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  currentImages = [];
+  currentIndex = 0;
 }
 </script>
 
