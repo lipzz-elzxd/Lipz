@@ -1,11 +1,5 @@
 {
-  "promo1": {
-    "type": "video",
-    "src": "https://files.catbox.moe/bjzrnc.mp4",
-    "sound": true
-  },
-  "promo2": {
-    "type": "image",
-    "src": "https://files.catbox.moe/2sgujb.jpg"
-  }
+  "promo1": { "type": "video", "src": "https://files.catbox.moe/bjzrnc.mp4", "sound": true },
+  "promo2": { "type": "image", "src": "https://files.catbox.moe/2sgujb.jpg" },
+  "promo3": { "type": "video", "src": "https://files.catbox.moe/xyz.mp4", "sound": false }
 }
