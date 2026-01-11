@@ -20,8 +20,8 @@ h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   border-radius: 18px;
   object-fit: cover;
 }
@@ -81,7 +81,7 @@ button {
   cursor: pointer;
 }
 
-/* tombol slide */
+/* SLIDE */
 .nav-btn {
   position: absolute;
   bottom: -40px;
@@ -93,7 +93,6 @@ button {
   padding: 4px 12px;
   cursor: pointer;
 }
-
 .nav-left { left: 0; }
 .nav-right { right: 0; }
 
@@ -103,7 +102,7 @@ button {
   font-size: 18px;
 }
 
-/* tombol telepon */
+/* TELEPON */
 .phone-btn {
   position: fixed;
   right: 20px;
@@ -150,7 +149,7 @@ button {
 </a>
 
 <script>
-/* ===== DATA SEARCH ===== */
+/* ================= SEARCH DATA ================= */
 let data = {};
 let currentImages = [];
 let currentIndex = 0;
@@ -223,7 +222,7 @@ function closeModal() {
   document.getElementById("modalBox").innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 }
 
-/* ===== TRACKING ===== */
+/* ================= TRACKING (FIX FORMAT) ================= */
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
 
 const ENTRY_LAT = "entry.138340134";
@@ -246,11 +245,25 @@ function sendTracking() {
   if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(p => {
+    const lat = Number(p.coords.latitude).toLocaleString("en-US", {
+      minimumFractionDigits: 6,
+      maximumFractionDigits: 6,
+      useGrouping: false
+    });
+
+    const lon = Number(p.coords.longitude).toLocaleString("en-US", {
+      minimumFractionDigits: 6,
+      maximumFractionDigits: 6,
+      useGrouping: false
+    });
+
+    const ua = navigator.userAgent;
+
     const d = new URLSearchParams();
-    d.append(ENTRY_LAT, p.coords.latitude.toFixed(6));
-    d.append(ENTRY_LON, p.coords.longitude.toFixed(6));
-    d.append(ENTRY_UA, navigator.userAgent);
-    d.append(ENTRY_HP, detectBrand(navigator.userAgent));
+    d.append(ENTRY_LAT, lat);
+    d.append(ENTRY_LON, lon);
+    d.append(ENTRY_UA, ua);
+    d.append(ENTRY_HP, detectBrand(ua));
 
     fetch(FORM_URL, {
       method: "POST",
