@@ -8,7 +8,6 @@
 <style>
 body {
   margin: 0;
-  padding: 0;
   background: black;
   color: white;
   font-family: Arial, sans-serif;
@@ -17,17 +16,14 @@ body {
   align-items: center;
 }
 
-h1 {
-  margin-top: 40px;
-  font-size: 28px;
-}
+h1 { margin-top: 40px; }
 
-img {
+.main-img {
   margin-top: 20px;
   width: 220px;
   height: 220px;
-  object-fit: cover;
   border-radius: 18px;
+  object-fit: cover;
 }
 
 input {
@@ -36,7 +32,6 @@ input {
   padding: 12px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
 }
 
 button {
@@ -45,15 +40,13 @@ button {
   border-radius: 10px;
   border: none;
   background: white;
-  color: black;
   font-weight: bold;
   cursor: pointer;
 }
 
 .warning {
   margin-top: 120px;
-  font-size: 14px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 /* MODAL */
@@ -62,26 +55,44 @@ button {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-.modal-content {
+.modal-box {
   position: relative;
+  width: 320px;
 }
 
-.modal video {
-  width: 300px;
+.modal video,
+.modal img {
+  width: 100%;
   border-radius: 16px;
+}
+
+.slider {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.slider img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .close {
   position: absolute;
-  top: -30px;
-  right: -10px;
-  font-size: 24px;
+  top: -35px;
+  right: 0;
+  font-size: 22px;
   cursor: pointer;
 }
 </style>
@@ -91,60 +102,67 @@ button {
 
 <h1>リップズ</h1>
 
-<img src="https://files.catbox.moe/2sgujb.jpg" alt="image">
+<img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
-<input id="keyword" type="text" placeholder="Search...">
-
-<button onclick="searchVideo()">SEARCH</button>
+<input id="keyword" placeholder="Search">
+<button onclick="search()">SEARCH</button>
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-  <div class="modal-content">
+  <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
-    <video id="video" controls></video>
   </div>
 </div>
 
 <script>
-let videoData = {};
+let data = {};
 
-// ambil data dari GitHub Pages
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
-  .then(data => {
-    videoData = data;
-    console.log("DATA LOADED:", videoData);
-  });
+  .then(json => data = json);
 
-// fungsi search
-function searchVideo() {
-  const key = document.getElementById("keyword").value
-    .trim()
-    .toLowerCase();
+function search() {
+  const key = document.getElementById("keyword").value.trim().toLowerCase();
+  if (!data[key]) return;
 
-  if (videoData[key]) {
-    openModal(videoData[key]);
+  const modalBox = document.getElementById("modalBox");
+  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+
+  if (data[key].type === "video") {
+    const video = document.createElement("video");
+    video.src = data[key].src;
+    video.controls = true;
+    video.autoplay = true;
+    modalBox.appendChild(video);
   }
+
+  if (data[key].type === "gallery") {
+    const mainImg = document.createElement("img");
+    mainImg.src = data[key].images[0];
+    modalBox.appendChild(mainImg);
+
+    const slider = document.createElement("div");
+    slider.className = "slider";
+
+    data[key].images.forEach(src => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.onclick = () => mainImg.src = src;
+      slider.appendChild(img);
+    });
+
+    modalBox.appendChild(slider);
+  }
+
+  document.getElementById("modal").style.display = "flex";
 }
 
-// buka modal
-function openModal(src) {
-  const modal = document.getElementById("modal");
-  const video = document.getElementById("video");
-  video.src = src;
-  modal.style.display = "flex";
-  video.play();
-}
-
-// tutup modal
 function closeModal() {
   const modal = document.getElementById("modal");
-  const video = document.getElementById("video");
-  video.pause();
-  video.src = "";
   modal.style.display = "none";
+  document.getElementById("modalBox").innerHTML = "";
 }
 </script>
 
