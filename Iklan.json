@@ -1,0 +1,11 @@
+{
+  "promo1": {
+    "type": "video",
+    "src": "https://files.catbox.moe/bjzrnc.mp4",
+    "sound": true
+  },
+  "promo2": {
+    "type": "image",
+    "src": "https://files.catbox.moe/2sgujb.jpg"
+  }
+}
