@@ -85,7 +85,7 @@ video.contain{
 <body>
 <div id="viewer">
   <div id="progress"></div>
-  <video id="media" playsinline muted preload="auto"></video>
+  <video id="media" autoplay muted playsinline preload="auto"></video>
   <div id="caption"></div>
   <div id="tap">tap untuk suara</div>
 </div>
@@ -127,7 +127,7 @@ function loadStatus(i){
   index=i;
 
   document.querySelectorAll(".bar span").forEach((s,j)=>{
-    s.style.width = j<i ? "100%" : "0%";
+    s.style.width = j < i ? "100%" : (j === i ? "0%" : "0%");
   });
 
   const item=data[i];
@@ -137,41 +137,43 @@ function loadStatus(i){
   media.src=item.url;
   media.load();
 
-  media.onloadedmetadata = () => {
+  // Hilangkan event onloadedmetadata, langsung pakai 'canplay' atau 'loadeddata' lebih reliable
+  media.onloadeddata = () => {
     const r = media.videoWidth / media.videoHeight;
-    media.className = r > 0.8 ? "contain" : "";
-    media.play(); // <-- INI BARU DIPANGGIL DI WAKTU YANG BENAR
+    media.className = r > 0.8 ? "contain" : "";  // adjust aspect ratio
+    // autoplay sudah di tag, jadi play() manual hanya jika perlu fallback
+    media.play().catch(e => console.log("Autoplay prevented:", e));
     startTimer(media.duration || 5);
   };
 }
 
 // TIMER BAR
 function startTimer(sec){
-  const bar=document.querySelectorAll(".bar span")[index];
-  bar.style.transition="none";
-  bar.style.width="0%";
+  const bar = document.querySelectorAll(".bar span")[index];
+  bar.style.transition = "none";
+  bar.style.width = "0%";
 
-  setTimeout(()=>{
-    bar.style.transition=`width ${sec}s linear`;
-    bar.style.width="100%";
-  },50);
+  setTimeout(() => {
+    bar.style.transition = `width ${sec}s linear`;
+    bar.style.width = "100%";
+  }, 50);
 
-  timer=setTimeout(()=>loadStatus(index+1),sec*1000);
+  timer = setTimeout(() => loadStatus(index + 1), sec * 1000);
 }
 
 // TAP = UNMUTE SAJA
-document.body.addEventListener("click",()=>{
-  media.muted=false;
+document.body.addEventListener("click", () => {
+  media.muted = false;
   tap.classList.add("hide");
-},{once:true});
+}, {once: true});
 
 // SWIPE
-let startX=0;
-document.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
-document.addEventListener("touchend",e=>{
-  const dx=e.changedTouches[0].clientX-startX;
-  if(dx>50) loadStatus(index-1);
-  if(dx<-50) loadStatus(index+1);
+let startX = 0;
+document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+document.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  if (dx > 50) loadStatus(index - 1);
+  if (dx < -50) loadStatus(index + 1);
 });
 </script>
 </body>
