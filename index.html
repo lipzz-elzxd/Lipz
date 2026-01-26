@@ -1,37 +1,19 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Status</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  </style>
-</head>
-<body>
-
 <video id="statusVideo" autoplay muted playsinline></video>
 
 <script>
+const video = document.getElementById('statusVideo');
+
 fetch('data.json')
   .then(res => res.json())
   .then(data => {
     if (!data.length) return;
-    document.getElementById('statusVideo').src = data[0].url;
+    video.src = data[0].url;
   });
-</script>
 
-</body>
-</html>
+// tap sekali = aktifkan suara
+document.body.addEventListener('click', () => {
+  video.muted = false;
+  video.volume = 1;
+  video.play();
+}, { once: true });
+</script>
