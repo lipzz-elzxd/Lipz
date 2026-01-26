@@ -22,26 +22,26 @@ html,body{
   position:relative;
 }
 
-video,img{
+video{
   width:100%;
   height:100%;
   object-fit:cover;
   background:black;
 }
 
-video.contain,img.contain{
+video.contain{
   object-fit:contain;
 }
 
 #caption{
   position:absolute;
-  bottom:12%;
+  bottom:14%;
   left:50%;
   transform:translateX(-50%);
   max-width:90%;
   color:white;
-  text-align:center;
   font-size:15px;
+  text-align:center;
   text-shadow:0 2px 6px rgba(0,0,0,.8);
 }
 
@@ -77,6 +77,7 @@ video.contain,img.contain{
   font-size:13px;
   opacity:.8;
 }
+
 .hide{display:none;}
 </style>
 </head>
@@ -84,7 +85,7 @@ video.contain,img.contain{
 <body>
 <div id="viewer">
   <div id="progress"></div>
-  <video id="media" playsinline preload="auto"></video>
+  <video id="media" playsinline muted preload="auto"></video>
   <div id="caption"></div>
   <div id="tap">tap untuk suara</div>
 </div>
@@ -95,20 +96,23 @@ const caption = document.getElementById("caption");
 const progress = document.getElementById("progress");
 const tap = document.getElementById("tap");
 
-let data=[],index=0,startX=0,timer=null;
+let data=[], index=0, timer=null;
 
+// LOAD DATA
 fetch("data.json")
 .then(r=>r.json())
 .then(d=>{
-  const now=Date.now();
-  data=d.filter(x=> now - x.time < 3*60*60*1000 );
+  const now = Date.now();
+  data = d.filter(x => now - x.time < 3*60*60*1000);
+  if(!data.length) return;
   buildBars();
-  show(0);
+  loadStatus(0);
 });
 
+// BUILD PROGRESS BAR
 function buildBars(){
   progress.innerHTML="";
-  data.forEach(()=> {
+  data.forEach(()=>{
     const b=document.createElement("div");
     b.className="bar";
     b.innerHTML="<span></span>";
@@ -116,8 +120,9 @@ function buildBars(){
   });
 }
 
-function show(i){
-  if(i<0||i>=data.length) return;
+// LOAD STATUS
+function loadStatus(i){
+  if(i<0 || i>=data.length) return;
   clearTimeout(timer);
   index=i;
 
@@ -126,21 +131,23 @@ function show(i){
   });
 
   const item=data[i];
-  media.src=item.url;
   caption.textContent=item.caption||"";
-  media.muted=true;
-  media.play();
 
-  media.onloadedmetadata=()=>{
-    const r=media.videoWidth/media.videoHeight;
-    media.className = r>0.8 ? "contain":"";
-    startTimer(media.duration||5);
+  media.pause();
+  media.src=item.url;
+  media.load();
+
+  media.onloadedmetadata = () => {
+    const r = media.videoWidth / media.videoHeight;
+    media.className = r > 0.8 ? "contain" : "";
+    media.play(); // <-- INI BARU DIPANGGIL DI WAKTU YANG BENAR
+    startTimer(media.duration || 5);
   };
 }
 
+// TIMER BAR
 function startTimer(sec){
   const bar=document.querySelectorAll(".bar span")[index];
-  let t=0;
   bar.style.transition="none";
   bar.style.width="0%";
 
@@ -149,20 +156,22 @@ function startTimer(sec){
     bar.style.width="100%";
   },50);
 
-  timer=setTimeout(()=>show(index+1),sec*1000);
+  timer=setTimeout(()=>loadStatus(index+1),sec*1000);
 }
 
+// TAP = UNMUTE SAJA
 document.body.addEventListener("click",()=>{
   media.muted=false;
   tap.classList.add("hide");
 },{once:true});
 
-// swipe
+// SWIPE
+let startX=0;
 document.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
 document.addEventListener("touchend",e=>{
   const dx=e.changedTouches[0].clientX-startX;
-  if(dx>50) show(index-1);
-  if(dx<-50) show(index+1);
+  if(dx>50) loadStatus(index-1);
+  if(dx<-50) loadStatus(index+1);
 });
 </script>
 </body>
