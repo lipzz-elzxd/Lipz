@@ -2,100 +2,168 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Status</title>
 
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+html,body{
+  margin:0;
+  padding:0;
+  background:black;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:system-ui;
 }
 
-#container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+#viewer{
+  width:100vw;
+  height:100vh;
+  position:relative;
 }
 
-video {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover; /* default WA */
-  background: black;
+video,img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:black;
 }
 
-/* caption ala WA */
-#caption {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  width: 100%;
-  padding: 0 16px;
-  color: white;
-  font-size: 15px;
-  text-align: left;
-  box-sizing: border-box;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+video.contain,img.contain{
+  object-fit:contain;
 }
 
-/* tap hint */
-#tapHint {
-  position: absolute;
-  top: 50%;
-  width: 100%;
-  text-align: center;
-  color: rgba(255,255,255,0.8);
-  font-size: 14px;
-  transform: translateY(-50%);
+#caption{
+  position:absolute;
+  bottom:12%;
+  left:50%;
+  transform:translateX(-50%);
+  max-width:90%;
+  color:white;
+  text-align:center;
+  font-size:15px;
+  text-shadow:0 2px 6px rgba(0,0,0,.8);
 }
 
-.hide {
-  display: none;
+#progress{
+  position:absolute;
+  top:10px;
+  left:10px;
+  right:10px;
+  height:3px;
+  display:flex;
+  gap:4px;
 }
+
+.bar{
+  flex:1;
+  background:rgba(255,255,255,.3);
+  overflow:hidden;
+}
+
+.bar span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:white;
+}
+
+#tap{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  color:white;
+  font-size:13px;
+  opacity:.8;
+}
+.hide{display:none;}
 </style>
 </head>
 
 <body>
-
-<div id="container">
-  <video id="video" autoplay muted playsinline></video>
-  <div id="tapHint">Tap untuk menyalakan suara</div>
-  <div id="caption">Tes status pertama</div>
+<div id="viewer">
+  <div id="progress"></div>
+  <video id="media" playsinline preload="auto"></video>
+  <div id="caption"></div>
+  <div id="tap">tap untuk suara</div>
 </div>
 
 <script>
-const video = document.getElementById("video");
+const media = document.getElementById("media");
 const caption = document.getElementById("caption");
-const tapHint = document.getElementById("tapHint");
+const progress = document.getElementById("progress");
+const tap = document.getElementById("tap");
 
-/* GANTI URL VIDEO DI SINI */
-video.src = "https://files.catbox.moe/bjzrnc.mp4";
+let data=[],index=0,startX=0,timer=null;
 
-/* DETEKSI RASIO → WA LOGIC */
-video.addEventListener("loadedmetadata", () => {
-  const ratio = video.videoWidth / video.videoHeight;
-
-  // kalau bukan vertikal (bukan 9:16)
-  if (ratio > 0.8) {
-    video.style.objectFit = "contain"; // kayak foto status WA
-  } else {
-    video.style.objectFit = "cover"; // full layar
-  }
+fetch("data.json")
+.then(r=>r.json())
+.then(d=>{
+  const now=Date.now();
+  data=d.filter(x=> now - x.time < 3*60*60*1000 );
+  buildBars();
+  show(0);
 });
 
-/* TAP SEKALI → NYALAKAN SUARA */
-document.body.addEventListener("click", () => {
-  video.muted = false;
-  video.volume = 1;
-  video.play();
-  tapHint.classList.add("hide");
-}, { once: true });
-</script>
+function buildBars(){
+  progress.innerHTML="";
+  data.forEach(()=> {
+    const b=document.createElement("div");
+    b.className="bar";
+    b.innerHTML="<span></span>";
+    progress.appendChild(b);
+  });
+}
 
+function show(i){
+  if(i<0||i>=data.length) return;
+  clearTimeout(timer);
+  index=i;
+
+  document.querySelectorAll(".bar span").forEach((s,j)=>{
+    s.style.width = j<i ? "100%" : "0%";
+  });
+
+  const item=data[i];
+  media.src=item.url;
+  caption.textContent=item.caption||"";
+  media.muted=true;
+  media.play();
+
+  media.onloadedmetadata=()=>{
+    const r=media.videoWidth/media.videoHeight;
+    media.className = r>0.8 ? "contain":"";
+    startTimer(media.duration||5);
+  };
+}
+
+function startTimer(sec){
+  const bar=document.querySelectorAll(".bar span")[index];
+  let t=0;
+  bar.style.transition="none";
+  bar.style.width="0%";
+
+  setTimeout(()=>{
+    bar.style.transition=`width ${sec}s linear`;
+    bar.style.width="100%";
+  },50);
+
+  timer=setTimeout(()=>show(index+1),sec*1000);
+}
+
+document.body.addEventListener("click",()=>{
+  media.muted=false;
+  tap.classList.add("hide");
+},{once:true});
+
+// swipe
+document.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(dx>50) show(index-1);
+  if(dx<-50) show(index+1);
+});
+</script>
 </body>
 </html>
